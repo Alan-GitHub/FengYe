@@ -2,50 +2,48 @@
 //  FYPersonalCenterViewController.m
 //  FengYe
 //
-//  Created by Alan Turing on 2017/12/10.
-//  Copyright © 2017年 Alan Turing. All rights reserved.
+//  Created by Alan Turing on 2018/3/3.
+//  Copyright © 2018年 Alan Turing. All rights reserved.
 //
 
 #import "FYPersonalCenterViewController.h"
 #import "CommonAttr.h"
-#import "FYPersonalCenterHeader.h"
-#import "FYDisplayCell.h"
+#import <Masonry.h>
+#import "FYWorksUnitData.h"
 #import "FYCollectionViewWaterFallLayout.h"
+#import "FYDisplayCell.h"
+#import "FYDrawboardCell.h"
+#import "FYDrawboardViewController.h"
+#import "FYCollectionViewController.h"
+#import "FYLikeViewController.h"
+#import "FYAttentionViewController.h"
+#import <AFNetworking.h>
+#import <MJExtension.h>
+#import "FYPersonalCenterHeaderData.h"
+#import <UIImageView+WebCache.h>
+#import "FYShowAllFansViewController.h"
 
-#define topHeaderHeight 167
-#define CollectionViewCellID @"CollectionViewCellID"
+#define TableViewCell @"TableViewCell"
 
-#define LayoutSpacing 10
+#define ControlViewHeight 170
 
-#define SpacingV  10
-#define DrawBoardColumnHeight 50
-#define DrawBoardScrollHeight 170
-#define UserColumnHeight 50
-#define UserScrollHeight 170
+#define HeadIconHeight 60
 
-@interface FYPersonalCenterViewController ()<UICollectionViewDelegate, UICollectionViewDataSource,UICollectionViewDelegateFlowLayout>
-
-@property(nonatomic, retain) FYPersonalCenterHeader* topHeader;
-
-@property(nonatomic, retain, readwrite) UICollectionView* collectionView;
-
-@property(nonatomic, retain, readwrite) UICollectionViewFlowLayout* flowLayout;
-@property(nonatomic, retain, readwrite) FYCollectionViewWaterFallLayout* waterFallLayout;
-
-@property(nonatomic, strong) NSMutableArray* imageName;
-@property(nonatomic, strong) NSMutableArray* imageLike;
-@property(nonatomic, strong) NSMutableArray* imageColle;
-@property(nonatomic, strong) NSMutableArray* attentionDrawBoard;
-@property(nonatomic, strong) NSMutableArray* attentionUser;
+@interface FYPersonalCenterViewController ()<UITableViewDataSource, UITableViewDelegate>
+@property(nonatomic, retain) UITableView* gTableView;
+@property(nonatomic, retain) UIScrollView* gScroView;
+@property(nonatomic, retain) UIView* gPersonInfo;
+@property(nonatomic, retain) UIView* gControlView;
 
 
-@property(nonatomic, retain) UIScrollView* attentionBackView;
-@property(nonatomic, retain) UIView* drawBoardColumn;
-@property(nonatomic, retain) UIScrollView* drawBoardScroll;
-@property(nonatomic, retain) UIView* userColumn;
-@property(nonatomic, retain) UIScrollView* userScroll;
+@property(nonatomic, retain) UIView* gDrawboard;
+@property(nonatomic, retain) UIView* gCollection;
+@property(nonatomic, retain) UIView* gLike;
+@property(nonatomic, retain) UIView* gAttention;
+@property(nonatomic, assign) NSInteger gPrevClicked;
 
-
+@property(nonatomic, retain) NSMutableArray<UIView*>* gMenuAttr;
+@property(nonatomic, retain) FYPersonalCenterHeaderData* gHeaderData;
 
 @end
 
@@ -54,475 +52,497 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.view.backgroundColor = [UIColor yellowColor];
+//    self.view.backgroundColor = [UIColor yellowColor];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(personalCenterBtnClick:) name:@"FYPersonalCenterBtnClick" object:nil];
+    UITableView* tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, ScreenWidth, ScreenHeight)];
+//    tableView.backgroundColor = [UIColor redColor];
+    tableView.delegate = self;
+    tableView.dataSource = self;
+    tableView.showsVerticalScrollIndicator = NO;
+    [self.view addSubview:tableView];
+    self.gTableView = tableView;
+//    tableView.scrollEnabled = NO;
     
-    //collectionView
-    [self.view addSubview:self.collectionView];
+    UIView* controlView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ScreenWidth, ControlViewHeight)];
+//    controlView.backgroundColor = [UIColor greenColor];
+    tableView.tableHeaderView = controlView;
+    self.gControlView = controlView;
     
-    self.topHeader = [[NSBundle mainBundle] loadNibNamed:@"FYPersonalCenterHeader" owner:nil options:nil].firstObject;
-    self.topHeader.backgroundColor = [UIColor redColor];
-    self.topHeader.frame = CGRectMake(0, -topHeaderHeight, ScreenWidth, topHeaderHeight);
-    [self.collectionView addSubview:self.topHeader];
-    [self.topHeader initBtn];
+    //default select the first menu.
+    self.gPrevClicked = 0;
     
+    FYDrawboardViewController* drawboardVC = [[FYDrawboardViewController alloc] init];
+    drawboardVC.mainVC = self;
+    [self addChildViewController:drawboardVC];
     
-    [self addNavigationBtn];
+    FYCollectionViewController* collectionVC = [[FYCollectionViewController alloc] init];
+    collectionVC.mainVC = self;
+    [self addChildViewController:collectionVC];
+
+    FYLikeViewController* likeVC = [[FYLikeViewController alloc] init];
+    likeVC.mainVC = self;
+    [self addChildViewController:likeVC];
     
-    for (int i = 0; i < 15; i++) {
-        NSString* imageStr = [NSString stringWithFormat:@"%d.bmp",i];
-        [self.imageLike addObject:imageStr];
-    }
+    FYAttentionViewController* attentionVC = [[FYAttentionViewController alloc] init];
+    attentionVC.mainVC = self;
+    [self addChildViewController:attentionVC];
     
-    for (int i = 0; i < 15; i++) {
-        NSString* imageStr = [NSString stringWithFormat:@"3.bmp"];
-        [self.imageName addObject:imageStr];
-    }
-    
-    for (int i = 0; i < 15; i++) {
-        NSString* imageStr = [NSString stringWithFormat:@"%d.bmp",14-i];
-        [self.imageColle addObject:imageStr];
-    }
-    
-    for (int i = 0; i < 3; i++) {
-        NSString* imageStr = [NSString stringWithFormat:@"8.bmp"];
-        [self.attentionDrawBoard addObject:imageStr];
-    }
-    
-    
+    [self loadData];
 }
 
-//懒加载
-- (NSMutableArray*) imageName{
-    if(!_imageName){
-        _imageName = [NSMutableArray array];
-    }
+- (void) loadData{
+
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionary];
     
-    return _imageName;
-}
-
-- (NSMutableArray*) imageLike{
-    if(!_imageLike){
-        _imageLike = [NSMutableArray array];
-    }
+    parameters[@"ver"] = @"1";
+    parameters[@"service"] = @"PERSONALCENTER";
+    parameters[@"biz"] = @"111";
+    parameters[@"time"] = @"20180126225600";
     
-    return _imageLike;
-}
-
-- (NSMutableArray*) imageColle{
-    if(!_imageColle){
-        _imageColle = [NSMutableArray array];
-    }
+    NSMutableDictionary* paramData = [NSMutableDictionary dictionary];
     
-    return _imageColle;
-}
-
-- (NSMutableArray*) attentionDrawBoard{
-    if(!_attentionDrawBoard){
-        _attentionDrawBoard = [NSMutableArray array];
-    }
+    NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+    NSString* username = [userDef objectForKey:@"loginName"];
+    paramData[@"username"] = username;
     
-    return _attentionDrawBoard;
-}
-
-- (NSMutableArray*) attentionUser{
-    if(!_attentionUser){
-        _attentionUser = [NSMutableArray array];
-    }
+    parameters[@"data"] = paramData;
     
-    return _attentionUser;
-}
-
-- (UIScrollView*) attentionBackView{
-
-    if (!_attentionBackView) {
-        _attentionBackView = [[UIScrollView alloc] init];
-//        _attentionBackView.frame = CGRectMake(0, 0, ScreenWidth, ScreenHeight-topHeaderHeight-SystemBarHeight-NavigationBarHeight);
-        _attentionBackView.frame = self.collectionView.bounds;
-        _attentionBackView.contentInset = UIEdgeInsetsMake(topHeaderHeight+SystemBarHeight+NavigationBarHeight, 0, 0, 0);
-//        _attentionBackView.backgroundColor = [UIColor greenColor];
-    }
-
-    return _attentionBackView;
-}
-
-- (UICollectionView*) collectionView{
-    if(!_collectionView){
-        
-        _collectionView = [[UICollectionView alloc] initWithFrame:self.view.bounds collectionViewLayout:self.flowLayout];
-        _collectionView.contentInset = UIEdgeInsetsMake(topHeaderHeight, 0, 0, 0);
-        _collectionView.backgroundColor = [UIColor colorWithRed:0.94 green:0.94 blue:0.94 alpha:1];
-//        _collectionView.backgroundColor = [UIColor blueColor];
-        
-        _collectionView.delegate = self;
-        _collectionView.dataSource = self;
-//        [_collectionView registerClass:[FYDisplayCell class] forCellWithReuseIdentifier:CollectionViewCellID];
-        [_collectionView registerNib:[UINib nibWithNibName:@"FYDisplayCell" bundle:nil] forCellWithReuseIdentifier:CollectionViewCellID];
-    }
+    NSString* url = ServerURL;
+    NSError* error;
+    NSData* jsonData = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:&error];
+    NSString* jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     
-    return _collectionView;
-}
-
-- (UICollectionViewFlowLayout*) flowLayout{
-    if (!_flowLayout) {
-        
-        _flowLayout = [[UICollectionViewFlowLayout alloc] init];
-        _flowLayout.minimumLineSpacing = LayoutSpacing;
-        _flowLayout.minimumInteritemSpacing = LayoutSpacing;
-        _flowLayout.sectionInset = UIEdgeInsetsMake(LayoutSpacing, LayoutSpacing, LayoutSpacing, LayoutSpacing);
-    }
+    AFURLSessionManager* manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
     
-    return _flowLayout;
-}
-
-- (UICollectionViewFlowLayout*) waterFallLayout{
-    if (!_waterFallLayout) {
-        
-        _waterFallLayout = [[FYCollectionViewWaterFallLayout alloc] init];
-        _waterFallLayout.data = self.imageLike;
-    }
+    NSMutableURLRequest* req = [[AFJSONRequestSerializer serializer] requestWithMethod:@"POST" URLString:url parameters:nil error:nil];
     
-    return _waterFallLayout;
-}
-
-- (UIView*)drawBoardColumn{
+    req.timeoutInterval = [[[NSUserDefaults standardUserDefaults] valueForKey:@"timeoutInterval"] longValue];
     
-    if (!_drawBoardColumn) {
-        
-        CGFloat drawBoardColumnY = SpacingV;
-        self.drawBoardColumn = [[UIView alloc] initWithFrame:CGRectMake(0, drawBoardColumnY, ScreenWidth, DrawBoardColumnHeight)];
-//        self.drawBoardColumn.backgroundColor = [UIColor blueColor];
-        
-        UILabel* label1 = [[UILabel alloc] init];
-        label1.text = @"画板";
-//        label1.backgroundColor = [UIColor redColor];
-        label1.frame = CGRectMake(0, 0, 70, DrawBoardColumnHeight);
-        label1.textAlignment = NSTextAlignmentCenter;
-        
-        UILabel* label2 = [[UILabel alloc] init];
-        label2.text = @"查看全部 >";
-//        label2.backgroundColor = [UIColor redColor];
-        label2.frame = CGRectMake(ScreenWidth - 100, 0, 100, DrawBoardColumnHeight);
-        label2.textAlignment = NSTextAlignmentCenter;
-        
-        [self.drawBoardColumn addSubview:label1];
-        [self.drawBoardColumn addSubview:label2];
-    }
+    [req setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [req setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+    [req setHTTPBody:[jsonString dataUsingEncoding:NSUTF8StringEncoding]];
     
-    return _drawBoardColumn;
-}
-
-- (UIScrollView*)drawBoardScroll{
-    
-    int i = 0;
-    if (!_drawBoardScroll) {
-        
-        CGFloat drawBoardScrollY = SpacingV + DrawBoardColumnHeight + SpacingV;
-        _drawBoardScroll = [[UIScrollView alloc] initWithFrame:CGRectMake(0, drawBoardScrollY, ScreenWidth, DrawBoardScrollHeight)];
-        
-        for (i=0; i<self.attentionDrawBoard.count; i++) {
-                  
-            UIView* element = [self drawBoardElement];
-            element.frame = CGRectMake(SpacingV+(SpacingV+ScreenWidth/3)*i, 0, ScreenWidth/3, DrawBoardScrollHeight);
-            [_drawBoardScroll addSubview: element];
+    [[manager dataTaskWithRequest:req completionHandler:^(NSURLResponse * _Nonnull response, NSDictionary*  _Nullable responseObject, NSError * _Nullable error) {
+        if(!error){
+//            NSLog(@"Reply JSON: %@", responseObject);
+            self.gHeaderData = [FYPersonalCenterHeaderData mj_objectWithKeyValues:responseObject[@"headerData"]];
+            [self setupControlView: self.gControlView];
+//            NSLog(@"attentionNum: %zd", self.gHeaderData.attentionNum);
+//            NSLog(@"collectionNum: %zd", self.gHeaderData.collectionNum);
+//            NSLog(@"drawboardNum: %zd", self.gHeaderData.drawboardNum);
+//            NSLog(@"fansNum: %zd", self.gHeaderData.fansNum);
+//            NSLog(@"likeNum: %zd", self.gHeaderData.likeNum);
+//            NSLog(@"headIconURL: %@", self.gHeaderData.headIconURL);
+        } else{
+            NSLog(@"Error: %@, %@, %@", error, response, responseObject);
         }
-        
-        _drawBoardScroll.showsHorizontalScrollIndicator = NO;
-        _drawBoardScroll.contentSize = CGSizeMake((SpacingV + ScreenWidth/3)*i + SpacingV, 0);
-        
-    }
-    
-    //需要处理数据的更新显示问题
-    
-    return _drawBoardScroll;
+    }] resume];
 }
 
 
-- (UIView*)userColumn{
+- (void) setupControlView:(UIView*) controlView{
     
-    if (!_userColumn) {
-        
-        CGFloat userColumnY = SpacingV + DrawBoardColumnHeight + SpacingV + DrawBoardScrollHeight + SpacingV;
-        _userColumn = [[UIView alloc] initWithFrame:CGRectMake(0, userColumnY, ScreenWidth, UserColumnHeight)];
-//        _userColumn.backgroundColor = [UIColor blueColor];
-        
-        UILabel* label1 = [[UILabel alloc] init];
-        label1.text = @"用户";
-//        label1.backgroundColor = [UIColor redColor];
-        label1.frame = CGRectMake(0, 0, 70, DrawBoardColumnHeight);
-        label1.textAlignment = NSTextAlignmentCenter;
-        
-        UILabel* label2 = [[UILabel alloc] init];
-        label2.text = @"查看全部 >";
-//        label2.backgroundColor = [UIColor redColor];
-        label2.frame = CGRectMake(ScreenWidth - 100, 0, 100, DrawBoardColumnHeight);
-        label2.textAlignment = NSTextAlignmentCenter;
-        
-        [self.userColumn addSubview:label1];
-        [self.userColumn addSubview:label2];
-    }
+    [self addPersonInfoView: controlView];
     
-    return _userColumn;
+    [self addFourLabelView: controlView];
+    
 }
 
-- (UIScrollView*)userScroll{
+- (void) addPersonInfoView: (UIView*) controlView{
     
-    if (!_userScroll) {
-        CGFloat userScrollY = SpacingV + DrawBoardColumnHeight + SpacingV + DrawBoardScrollHeight + SpacingV + UserColumnHeight + SpacingV;
-        _userScroll = [[UIScrollView alloc] initWithFrame:CGRectMake(0, userScrollY, ScreenWidth, UserScrollHeight)];
-//        _userScroll.backgroundColor = [UIColor yellowColor];
+    //back view
+    UIView* personInfo = [[UIView alloc] init];
+    [controlView addSubview:personInfo];
+    [personInfo mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(controlView.mas_top).with.offset(10);
+        make.left.equalTo(controlView.mas_left).with.offset(0);
+        make.right.equalTo(controlView.mas_right).with.offset(0);
+        make.height.mas_equalTo(HeadIconHeight);
+    }];
+    personInfo.backgroundColor = [UIColor whiteColor];
+    self.gPersonInfo = personInfo;
+    
+    //head icon view
+    UIImageView* imageView = [[UIImageView alloc] init];
+    [personInfo addSubview:imageView];
+    [imageView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(personInfo).with.offset(0);
+        make.left.equalTo(personInfo.mas_left).with.offset(20);
+        make.bottom.equalTo(personInfo.mas_bottom).with.offset(0);
+        make.width.equalTo(personInfo.mas_height);
+    }];
+    imageView.backgroundColor = [UIColor yellowColor];
+    [imageView sd_setImageWithURL:[NSURL URLWithString:self.gHeaderData.headIconURL] completed:nil];
+    imageView.layer.cornerRadius = HeadIconHeight/2;
+    imageView.layer.masksToBounds = YES;
+    
+    //name label
+    UILabel* username = [[UILabel alloc] init];
+    [personInfo addSubview:username];
+    [username mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(imageView.mas_top).with.offset(5);
+        make.left.equalTo(imageView.mas_right).with.offset(10);
+    }];
+    username.text = self.gHeaderData.username;
+    username.font = [UIFont systemFontOfSize:20];
+    [username sizeToFit];
+    
+    //fans
+    UILabel* fans = [[UILabel alloc] init];
+    [personInfo addSubview:fans];
+    [fans mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.bottom.equalTo(imageView.mas_bottom).with.offset(-5);
+        make.left.equalTo(imageView.mas_right).with.offset(10);
+    }];
+    fans.text = [NSString stringWithFormat: @"%zd fans >", self.gHeaderData.fansNum] ;
+    fans.font = [UIFont systemFontOfSize:13];
+    [fans sizeToFit];
+    
+    UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(clickedFansLabel:)];
+    fans.userInteractionEnabled = YES;
+    [fans addGestureRecognizer:tap];
+}
+
+- (void) addFourLabelView: (UIView*) controlView{
+    
+    //back view
+    UIView* fourLabelBackView = [[UIView alloc] init];
+    [controlView addSubview:fourLabelBackView];
+    [fourLabelBackView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.gPersonInfo.mas_bottom).with.offset(40);
+        make.left.equalTo(controlView.mas_left).with.offset(0);
+        make.bottom.equalTo(controlView.mas_bottom).with.offset(-10);
+        make.right.equalTo(controlView.mas_right).with.offset(0);
+    }];
+    fourLabelBackView.backgroundColor = [UIColor whiteColor];
+    
+    CGFloat labelSpacing = 10;
+    CGFloat labelWidth = (ScreenWidth - labelSpacing * 8)/4;
+    
+    //draw board view
+    UIView* drawboard = [[UIView alloc] init];
+    [fourLabelBackView addSubview:drawboard];
+    [drawboard mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(fourLabelBackView.mas_top).with.offset(0);
+        make.left.equalTo(fourLabelBackView.mas_left).with.offset(labelSpacing);
+        make.bottom.equalTo(fourLabelBackView.mas_bottom).with.offset(0);
+        make.width.mas_equalTo(labelWidth);
+    }];
+    drawboard.backgroundColor = [UIColor lightGrayColor];
+    self.gDrawboard = drawboard;
+    [self.gMenuAttr addObject:drawboard];
+    
+    UITapGestureRecognizer* tapDrawBoard = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction:)];
+    drawboard.tag = 0;
+    [drawboard addGestureRecognizer:tapDrawBoard];
+    
+    UILabel* drawboardNums = [[UILabel alloc] init];
+    [drawboard addSubview:drawboardNums];
+    [drawboardNums mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(drawboard.mas_top).with.offset(0);
+        make.left.equalTo(drawboard.mas_left).with.offset(0);
+        make.right.equalTo(drawboard.mas_right).with.offset(0);
+        make.height.mas_equalTo(drawboard.mas_height).multipliedBy(0.5);
+    }];
+    drawboardNums.backgroundColor = [UIColor clearColor];
+    drawboardNums.text = [NSString stringWithFormat:@"%zd", self.gHeaderData.drawboardNum];
+    drawboardNums.textAlignment = NSTextAlignmentCenter;
+    
+    UILabel* drawboardTitle = [[UILabel alloc] init];
+    [drawboard addSubview:drawboardTitle];
+    [drawboardTitle mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(drawboardNums.mas_bottom).with.offset(0);
+        make.left.equalTo(drawboard.mas_left).with.offset(0);
+        make.right.equalTo(drawboard.mas_right).with.offset(0);
+        make.bottom.equalTo(drawboard.mas_bottom).with.offset(0);
+    }];
+    drawboardTitle.backgroundColor = [UIColor clearColor];
+    drawboardTitle.text = @"画板";
+    drawboardTitle.font = [UIFont systemFontOfSize:13];
+    drawboardTitle.textAlignment = NSTextAlignmentCenter;
+
+    //collection view
+    UIView* collection = [[UIView alloc] init];
+    [fourLabelBackView addSubview:collection];
+    [collection mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(fourLabelBackView.mas_top).with.offset(0);
+        make.left.equalTo(drawboard.mas_right).with.offset(labelSpacing*2);
+        make.bottom.equalTo(fourLabelBackView.mas_bottom).with.offset(0);
+        make.width.mas_equalTo(labelWidth);
+    }];
+    collection.backgroundColor = [UIColor clearColor];
+    self.gCollection = collection;
+    [self.gMenuAttr addObject:collection];
+    
+    UITapGestureRecognizer* tapCollection = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction:)];
+    collection.tag = 1;
+    [collection addGestureRecognizer:tapCollection];
+    
+    UILabel* collectionNums = [[UILabel alloc] init];
+    [collection addSubview:collectionNums];
+    [collectionNums mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(collection.mas_top).with.offset(0);
+        make.left.equalTo(collection.mas_left).with.offset(0);
+        make.right.equalTo(collection.mas_right).with.offset(0);
+        make.height.mas_equalTo(collection.mas_height).multipliedBy(0.5);
+    }];
+    collectionNums.backgroundColor = [UIColor clearColor];
+    collectionNums.text = [NSString stringWithFormat:@"%zd", self.gHeaderData.collectionNum];
+    collectionNums.textAlignment = NSTextAlignmentCenter;
+    
+    UILabel* collectionTitle = [[UILabel alloc] init];
+    [collection addSubview:collectionTitle];
+    [collectionTitle mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(collectionNums.mas_bottom).with.offset(0);
+        make.left.equalTo(collection.mas_left).with.offset(0);
+        make.right.equalTo(collection.mas_right).with.offset(0);
+        make.bottom.equalTo(collection.mas_bottom).with.offset(0);
+    }];
+    collectionTitle.backgroundColor = [UIColor clearColor];
+    collectionTitle.text = @"采集";
+    collectionTitle.font = [UIFont systemFontOfSize:13];
+    collectionTitle.textAlignment = NSTextAlignmentCenter;
+    
+    //like view
+    UIView* like = [[UIView alloc] init];
+    [fourLabelBackView addSubview:like];
+    [like mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(fourLabelBackView.mas_top).with.offset(0);
+        make.left.equalTo(collection.mas_right).with.offset(labelSpacing*2);
+        make.bottom.equalTo(fourLabelBackView.mas_bottom).with.offset(0);
+        make.width.mas_equalTo(labelWidth);
+    }];
+    like.backgroundColor = [UIColor clearColor];
+    self.gLike = like;
+    [self.gMenuAttr addObject:like];
+    
+    UITapGestureRecognizer* tapLike = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction:)];
+    like.tag = 2;
+    [like addGestureRecognizer:tapLike];
+
+    UILabel* likeNums = [[UILabel alloc] init];
+    [like addSubview:likeNums];
+    [likeNums mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(like.mas_top).with.offset(0);
+        make.left.equalTo(like.mas_left).with.offset(0);
+        make.right.equalTo(like.mas_right).with.offset(0);
+        make.height.mas_equalTo(like.mas_height).multipliedBy(0.5);
+    }];
+    likeNums.backgroundColor = [UIColor clearColor];
+    likeNums.text = [NSString stringWithFormat:@"%zd", self.gHeaderData.likeNum];
+    likeNums.textAlignment = NSTextAlignmentCenter;
+    
+    UILabel* likeTitle = [[UILabel alloc] init];
+    [like addSubview:likeTitle];
+    [likeTitle mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(likeNums.mas_bottom).with.offset(0);
+        make.left.equalTo(like.mas_left).with.offset(0);
+        make.right.equalTo(like.mas_right).with.offset(0);
+        make.bottom.equalTo(like.mas_bottom).with.offset(0);
+    }];
+    likeTitle.backgroundColor = [UIColor clearColor];
+    likeTitle.text = @"喜欢";
+    likeTitle.font = [UIFont systemFontOfSize:13];
+    likeTitle.textAlignment = NSTextAlignmentCenter;
+    
+    //regard view
+    UIView* attention = [[UIView alloc] init];
+    [fourLabelBackView addSubview:attention];
+    [attention mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(fourLabelBackView.mas_top).with.offset(0);
+        make.left.equalTo(like.mas_right).with.offset(labelSpacing*2);
+        make.bottom.equalTo(fourLabelBackView.mas_bottom).with.offset(0);
+        make.width.mas_equalTo(labelWidth);
+    }];
+    attention.backgroundColor = [UIColor clearColor];
+    self.gAttention = attention;
+    [self.gMenuAttr addObject:attention];
+    
+    UITapGestureRecognizer* tapAttention = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction:)];
+    attention.tag = 3;
+    [attention addGestureRecognizer:tapAttention];
+    
+    UILabel* attentionNums = [[UILabel alloc] init];
+    [attention addSubview:attentionNums];
+    [attentionNums mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(attention.mas_top).with.offset(0);
+        make.left.equalTo(attention.mas_left).with.offset(0);
+        make.right.equalTo(attention.mas_right).with.offset(0);
+        make.height.mas_equalTo(attention.mas_height).multipliedBy(0.5);
+    }];
+    attentionNums.backgroundColor = [UIColor clearColor];
+    attentionNums.text = [NSString stringWithFormat:@"%zd", self.gHeaderData.attentionNum];
+    attentionNums.textAlignment = NSTextAlignmentCenter;
+    
+    UILabel* attentionTitle = [[UILabel alloc] init];
+    [attention addSubview:attentionTitle];
+    [attentionTitle mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(collectionNums.mas_bottom).with.offset(0);
+        make.left.equalTo(attention.mas_left).with.offset(0);
+        make.right.equalTo(attention.mas_right).with.offset(0);
+        make.bottom.equalTo(attention.mas_bottom).with.offset(0);
+    }];
+    attentionTitle.backgroundColor = [UIColor clearColor];
+    attentionTitle.text = @"关注";
+    attentionTitle.font = [UIFont systemFontOfSize:13];
+    attentionTitle.textAlignment = NSTextAlignmentCenter;
+}
+
+- (void) tapAction:(UIGestureRecognizer*) gesture{
+
+    NSInteger index = gesture.view.tag;
+    
+    if (index == self.gPrevClicked)
+        return;
+    
+    //change color
+    UIView* preView = self.gMenuAttr[self.gPrevClicked];
+    preView.backgroundColor = [UIColor clearColor];
+    
+    UIView* selected = self.gMenuAttr[index];
+    selected.backgroundColor = [UIColor lightGrayColor];
+    
+    self.gPrevClicked = index;
+    
+    //change origin
+    CGPoint point = self.gScroView.contentOffset;
+    point.x = index * ScreenWidth;
+    self.gScroView.contentOffset = point;
+    
+    [self addViewToScrollView:index];
+    
+}
+
+- (void) clickedFansLabel:(id) gesture{
+    
+    FYShowAllFansViewController* fansVC = [[FYShowAllFansViewController alloc] init];
+    [self presentViewController:fansVC animated:YES completion:nil];
+}
+
+- (void) addViewToScrollView:(NSInteger) index{
+
+//    if (self.gScroView.subviews.count == 4) {
+//        return;
+//    }
+
+    UIView* goalView = self.childViewControllers[index].view;
+    
+    for (int i = 0; i < self.gScroView.subviews.count; i++) {
         
-        int i;
-        UIView* userElement;
-        for (i=0; i<5; i++) {
- 
-            userElement = [self userElement];
-            userElement.frame = CGRectMake(SpacingV+(SpacingV+ScreenWidth/3)*i, 0, ScreenWidth/3, UserScrollHeight);
-            [_userScroll addSubview:userElement];
+        if ([goalView isEqual:self.gScroView.subviews[i]]) {
+            
+            return;
         }
-        
-         _userScroll.showsHorizontalScrollIndicator = NO;
-        _userScroll.contentSize = CGSizeMake((SpacingV + ScreenWidth/3)*i + SpacingV, 0);
     }
-    
-    return _userScroll;
+
+    [self.gScroView addSubview:goalView];
 }
 
-- (void)addNavigationBtn{
+- (NSMutableArray*) gMenuAttr{
     
-    
-//    CGFloat spacing = 5;
-//    CGFloat toolWidth = 100 + 2 * spacing;
-//
-//    UIToolbar* tool = [[UIToolbar alloc] init];
-//    tool.frame = CGRectMake(0, 0, toolWidth, 44);
-//    tool.backgroundColor = [UIColor redColor];
-//
-//    UIButton* btnSearch = [UIButton buttonWithType:UIButtonTypeCustom];
-//    btnSearch.frame = CGRectMake(0, 0, toolWidth/3, 44);
-//    btnSearch.backgroundColor = [UIColor yellowColor];
-//    [tool addSubview:btnSearch];
-//
-//    UIButton* btnSettings = [UIButton buttonWithType:UIButtonTypeCustom];
-//    btnSettings.frame = CGRectMake(toolWidth/3 + spacing, 0, toolWidth/3, 44);
-//    btnSettings.backgroundColor = [UIColor yellowColor];
-//    [tool addSubview:btnSettings];
-//
-//    UIButton* btnPublish = [UIButton buttonWithType:UIButtonTypeCustom];
-//    btnPublish.frame = CGRectMake(2*(toolWidth/3+spacing), 0, toolWidth/3, 44);
-//    btnPublish.backgroundColor = [UIColor yellowColor];
-//    [tool addSubview:btnPublish];
-//
-//
-//    UIBarButtonItem* item = [[UIBarButtonItem alloc] initWithCustomView:tool];
-//    self.navigationItem.rightBarButtonItem = item;
-    
-    NSMutableArray<UIBarButtonItem*>* att = [NSMutableArray array];
-    
-    UIButton* btnPublish = [UIButton buttonWithType:UIButtonTypeCustom];
-    //        btnPublish.frame = CGRectMake(2*(toolWidth/3+spacing), 0, toolWidth/3, 44);
-    [btnPublish setTitle:@"publish" forState:UIControlStateNormal];
-    btnPublish.backgroundColor = [UIColor greenColor];
-    UIBarButtonItem* itemPublish = [[UIBarButtonItem alloc] initWithCustomView:btnPublish];
-    [att addObject:itemPublish];
-    
-    UIButton* btnSettings = [UIButton buttonWithType:UIButtonTypeCustom];
-//        btnSettings.frame = CGRectMake(toolWidth/3 + spacing, 0, toolWidth/3, 44);
-    [btnSettings setTitle:@"settings" forState:UIControlStateNormal];
-    btnSettings.backgroundColor = [UIColor greenColor];
-    UIBarButtonItem* itemSettings = [[UIBarButtonItem alloc] initWithCustomView:btnSettings];
-    [att addObject:itemSettings];
-    
-    UIButton* btnSearch = [UIButton buttonWithType:UIButtonTypeCustom];
-    //        btnSearch.frame = CGRectMake(0, 0, 100, 44);
-    [btnSearch setTitle:@"Search" forState:UIControlStateNormal];
-    btnSearch.backgroundColor = [UIColor greenColor];
-    UIBarButtonItem* itemSearch = [[UIBarButtonItem alloc] initWithCustomView:btnSearch];
-    [att addObject:itemSearch];
-    
-    self.navigationItem.rightBarButtonItems  = att;
-    
-}
-
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
-    switch (collectionView.tag) {
-        case 0:
-            return 2;// self.imageName.count;
-            break;
-        
-        case 1:
-            return self.imageColle.count;
-            break;
-            
-        case 2:
-            return self.imageLike.count;
-            break;
-            
-        case 3:
-            return 0;
-            break;
-            
-        default:
-            break;
+    if (!_gMenuAttr) {
+        _gMenuAttr = [NSMutableArray array];
     }
     
-    return 0;
+    return _gMenuAttr;
 }
 
-- (FYDisplayCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
+- (FYPersonalCenterHeaderData*) gHeaderData{
     
-    FYDisplayCell* cell = [collectionView dequeueReusableCellWithReuseIdentifier:CollectionViewCellID forIndexPath:indexPath];
-    
-    switch (collectionView.tag) {
-        case 0:
-            [cell.workImage setImage:[UIImage imageNamed:self.imageName[indexPath.item]]];
-            break;
-            
-        case 1:
-            [cell.workImage setImage:[UIImage imageNamed:self.imageColle[indexPath.item]]];
-            break;
-            
-        case 2:
-            [cell.workImage setImage:[UIImage imageNamed:self.imageLike[indexPath.item]]];
-            break;
-            
-        case 3:
-            break;
-            
-        default:
-            break;
+    if (!_gHeaderData) {
+        _gHeaderData = [[FYPersonalCenterHeaderData alloc] init];
     }
     
-//    cell.backgroundColor = [UIColor greenColor];
+    return _gHeaderData;
+}
+
+//delegate
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
     
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    
+    return 1;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:TableViewCell];
+    if (nil == cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:TableViewCell];
+    }
+    
+    //scrollview back
+    self.gScroView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, ScreenWidth, ScreenHeight-SystemHeight)];
+    self.gScroView.contentSize = CGSizeMake(ScreenWidth * 4, self.gScroView.bounds.size.height);
+    self.gScroView.showsHorizontalScrollIndicator = NO;
+    self.gScroView.scrollEnabled = NO;
+    self.gScroView.backgroundColor = [UIColor colorWithRed:0.94 green:0.94 blue:0.94 alpha:1];;
+    [self.gScroView addSubview:self.childViewControllers[0].view];
+    [cell addSubview:self.gScroView];
+
     return cell;
 }
 
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    return CGSizeMake((ScreenWidth - (3 * LayoutSpacing))/2, 230);
+    return ScreenHeight - SystemHeight;  //20 + 44 + 49
 }
 
-- (void) personalCenterBtnClick:(NSNotification*) notification{
-    int tag = [[notification.userInfo objectForKey:@"btnTag"] intValue];
-//    NSLog(@"%d", tag);
-    
-    switch (tag) {
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
+
+    if (scrollView.contentOffset.y >= (scrollView.contentSize.height-scrollView.bounds.size.height + SystemBottomHeight -0.5)) {
+        self.offsetType = OffsetTypeMax;
+    } else if (scrollView.contentOffset.y <= 0) {
+        self.offsetType = OffsetTypeMin;
+    } else {
+        self.offsetType = OffsetTypeCenter;
+    }
+
+    //哪一个子collectionview在滚动
+    NSInteger index = self.gPrevClicked;
+    OffsetType childOffsetType = 0;
+
+    switch (index) {
         case 0:
             {
-                [self.topHeader removeFromSuperview];
-                [self.attentionBackView removeFromSuperview];
-                [self.collectionView addSubview:self.topHeader];
-                
-                [self.collectionView setCollectionViewLayout:self.flowLayout animated:NO];
-                self.collectionView.tag = 0;
-                [self.collectionView reloadData];
-                break;
+                FYDrawboardViewController* vc = self.childViewControllers[0];
+                childOffsetType = vc.offsetType;
             }
-        
+            break;
+
         case 1:
             {
-                [self.topHeader removeFromSuperview];
-                [self.attentionBackView removeFromSuperview];
-                [self.collectionView addSubview:self.topHeader];
-                
-                [self.collectionView setCollectionViewLayout:self.waterFallLayout animated:NO];
-                self.collectionView.tag = 1;
-                [self.collectionView reloadData];
-                break;
+                FYCollectionViewController* vc = self.childViewControllers[1];
+                childOffsetType = vc.offsetType;
             }
-            
+            break;
+
         case 2:
             {
-                [self.topHeader removeFromSuperview];
-                [self.attentionBackView removeFromSuperview];
-                [self.collectionView addSubview:self.topHeader];
-                
-                [self.collectionView setCollectionViewLayout:self.waterFallLayout animated:NO];
-                self.collectionView.tag = 2;
-                [self.collectionView reloadData];
-                break;
+                FYLikeViewController* vc = self.childViewControllers[2];
+                childOffsetType = vc.offsetType;
             }
-        
+            break;
+            
         case 3:
             {
-                [self.topHeader removeFromSuperview];
-                [self.attentionBackView addSubview:self.topHeader];
-                [self displayAttentionInterface];
-                self.collectionView.tag = 3;
-                [self.collectionView reloadData];
-                break;
+                FYAttentionViewController* vc = self.childViewControllers[3];
+                childOffsetType = vc.offsetType;
             }
+            break;
 
         default:
             break;
     }
 
-}
+    if (childOffsetType == OffsetTypeMin) { }
 
-- (void) displayAttentionInterface{
-    
-    [self.collectionView addSubview:self.attentionBackView];
-    [self.attentionBackView addSubview:self.drawBoardColumn];
-    [self.attentionBackView addSubview:self.drawBoardScroll];
-    [self.attentionBackView addSubview:self.userColumn];
-    [self.attentionBackView addSubview:self.userScroll];
-    
-    self.attentionBackView.contentSize = CGSizeMake(ScreenWidth, self.userScroll.frame.origin.y + UserScrollHeight + SpacingV + SystemBottomHeight);
-}
-
-- (UIView*) drawBoardElement{
-    
-    UIView* element = [[UIView alloc] init];
-    element.bounds = CGRectMake(0, 0, ScreenWidth/3, DrawBoardScrollHeight);
-    element.backgroundColor = [UIColor whiteColor];
-    
-    UIImageView* image = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"8.bmp"]];
-    image.frame = CGRectMake(0, 0, ScreenWidth/3, DrawBoardScrollHeight*2/3);
-    [element addSubview:image];
-    
-    UILabel* bigText = [[UILabel alloc] initWithFrame:CGRectMake(10, DrawBoardScrollHeight*2/3, 100, DrawBoardScrollHeight/6)];
-    bigText.text = @"动漫礼服";
-    bigText.font = [UIFont systemFontOfSize:15];
-    [element addSubview:bigText];
-    
-    UILabel* littleText = [[UILabel alloc] initWithFrame:CGRectMake(10, DrawBoardScrollHeight*5/6, 100, DrawBoardScrollHeight/6)];
-    littleText.text = @"吻笑眉";
-    littleText.font = [UIFont systemFontOfSize:13];
-    [element addSubview:littleText];
-    
-    return element;
-}
-
-- (UIView*) userElement{
-    
-    UIView* element = [[UIView alloc] init];
-    element.bounds = CGRectMake(0, 0, ScreenWidth/3, DrawBoardScrollHeight);
-    element.backgroundColor = [UIColor whiteColor];
-    
-    UIImageView* image = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"8.bmp"]];
-    image.frame = CGRectMake(25, 20, 70, 70);
-    image.layer.cornerRadius = 35;
-    image.layer.masksToBounds = YES;
-    [element addSubview:image];
-    
-    UILabel* bigText = [[UILabel alloc] initWithFrame:CGRectMake(10, DrawBoardScrollHeight*2/3, 100, DrawBoardScrollHeight/6)];
-    bigText.text = @"动漫礼服";
-    bigText.font = [UIFont systemFontOfSize:15];
-    [element addSubview:bigText];
-    
-    UILabel* littleText = [[UILabel alloc] initWithFrame:CGRectMake(10, DrawBoardScrollHeight*5/6, 100, DrawBoardScrollHeight/6)];
-    littleText.text = @"吻笑眉";
-    littleText.font = [UIFont systemFontOfSize:13];
-    [element addSubview:littleText];
-    
-    return element;
-}
-
-- (void)dealloc{
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"FYPersonalCenterBtnClick" object:nil];
+    if (childOffsetType == OffsetTypeCenter) {
+        scrollView.contentOffset = CGPointMake(scrollView.contentOffset.x, scrollView.contentSize.height-scrollView.bounds.size.height + SystemBottomHeight);
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -530,17 +550,5 @@
     // Dispose of any resources that can be recreated.
 }
 
-/*
-// 设置按钮选中标题的颜色:富文本:描述一个文字颜色,字体,阴影,空心,图文混排
-// 创建一个描述文本属性的字典
-NSMutableDictionary *attrs = [NSMutableDictionary dictionary];
-attrs[NSForegroundColorAttributeName] = [UIColor blackColor];
-[itemSearch setTitleTextAttributes:attrs forState:UIControlStateNormal];
-
-// 设置字体尺寸:只有设置正常状态下,才会有效果
-NSMutableDictionary *attrsNor = [NSMutableDictionary dictionary];
-attrsNor[NSFontAttributeName] = [UIFont systemFontOfSize:13];
-[itemSearch setTitleTextAttributes:attrsNor forState:UIControlStateNormal];
-*/
 
 @end
