@@ -7,7 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "FYDrawboardViewController.h"
 
 @interface FYNewDrawboardViewController : UIViewController
 
+@property(nonatomic, retain) FYDrawboardViewController* drawboardVC;
 @end

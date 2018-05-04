@@ -10,4 +10,8 @@
 
 @interface uploadModel : NSObject
 
+@property(nonatomic, copy) NSString* path;
+@property(nonatomic, copy) NSString* type;
+@property(nonatomic, copy) NSString* name;
+@property(nonatomic, assign) BOOL isUploaded;
 @end

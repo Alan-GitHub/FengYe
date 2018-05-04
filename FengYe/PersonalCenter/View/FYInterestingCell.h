@@ -9,5 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface FYInterestingCell : UICollectionViewCell
+@property (weak, nonatomic) IBOutlet UIImageView *coverImage;
+@property (weak, nonatomic) IBOutlet UILabel *interestGroupName;
 
 @end

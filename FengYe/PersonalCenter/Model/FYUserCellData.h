@@ -10,4 +10,7 @@
 
 @interface FYUserCellData : NSObject
 
+@property(nonatomic, copy) NSString* userHeadIcon;
+@property(nonatomic, copy) NSString* userName;
+@property(nonatomic, assign) NSInteger fansNums;
 @end

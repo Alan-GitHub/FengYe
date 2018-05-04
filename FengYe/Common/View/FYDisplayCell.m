@@ -15,15 +15,10 @@
 
 @implementation FYDisplayCell
 
-- (void)layoutSubviews{
-    
-    [super layoutSubviews];
-    
-    //
-    CGRect rect =  self.descriptionLabel.frame;
-    rect.size = CGSizeMake(self.descriptionLabel.bounds.size.width, self.descriptionLabel.bounds.size.height);
-    self.descriptionLabel.frame = rect;
-}
+//- (void)layoutSubviews{
+//
+//    [super layoutSubviews];
+//}
 
 - (void)awakeFromNib {
     [super awakeFromNib];

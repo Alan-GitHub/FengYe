@@ -7,7 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CommonAttr.h"
+#import "FYPersonalCenterViewController.h"
 
 @interface FYAttentionViewController : UIViewController
 
+@property (nonatomic, assign) OffsetType offsetType;
+@property (nonatomic, weak) FYPersonalCenterViewController *mainVC;
+
+@property (nonatomic, copy) NSString* userName;
 @end

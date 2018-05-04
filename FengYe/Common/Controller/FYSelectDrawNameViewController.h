@@ -10,4 +10,12 @@
 
 @interface FYSelectDrawNameViewController : UIViewController
 
+@property(nonatomic, retain) NSMutableArray<NSString*>* drawName;
+@property(nonatomic, copy) NSString* picURL;
+@property(nonatomic, copy) NSString* picDesc;
+@property(nonatomic, copy) NSString* originUserName;
+@property(nonatomic, copy) NSString* originDrawName;
+
+//block
+@property(nonatomic,copy) void (^updateForwardNum)(NSInteger forwardNum);
 @end

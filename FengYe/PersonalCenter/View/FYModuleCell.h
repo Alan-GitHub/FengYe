@@ -9,5 +9,8 @@
 #import <UIKit/UIKit.h>
 
 @interface FYModuleCell : UICollectionViewCell
+@property (weak, nonatomic) IBOutlet UIImageView *coverImage;
+@property (weak, nonatomic) IBOutlet UILabel *drawboardName;
+@property (weak, nonatomic) IBOutlet UILabel *ownerUserName;
 
 @end

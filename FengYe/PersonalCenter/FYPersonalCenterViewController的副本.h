@@ -13,6 +13,6 @@
 @interface FYPersonalCenterViewController : UIViewController
 @property (nonatomic, assign) OffsetType offsetType;
 
-@property (nonatomic, copy) NSString* userName;
-
+@property(nonatomic, strong) NSMutableArray<FYWorksUnitData*>* gCollectionUnitAttr;
+@property(nonatomic, strong) NSMutableArray<FYWorksUnitData*>* gLikeUnitAttr;
 @end

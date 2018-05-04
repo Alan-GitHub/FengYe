@@ -7,21 +7,99 @@
 //
 
 #import "FYDetailPrivateViewController.h"
+#import <AFNetworking.h>
+#import "CommonAttr.h"
+#import "FYCommentData.h"
+#import <MJExtension.h>
+#import <UIImageView+WebCache.h>
+#import "FYMessagePrivateDetailCell.h"
+#import "UIView+Frame.h"
+#import "FYPersonalCenterViewController.h"
+
+#define MessagePrivateDetailID @"MessagePrivateDetailID"
+
+#define CommentUserHeadIconHeight 40
+#define Spacing 10
 
 @interface FYDetailPrivateViewController ()
 
+@property(nonatomic, retain) NSMutableArray<FYCommentData*>* privMsgContent;
 @end
 
 @implementation FYDetailPrivateViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.navigationItem.title = self.privMsgUsername;
     
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
+//    self.tableView.estimatedRowHeight = 50;
+//    self.tableView.rowHeight = UITableViewAutomaticDimension;
     
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    
+    [self loadData];
+}
+
+- (void) loadData{
+    
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionary];
+    
+    parameters[@"ver"] = @"1";
+    parameters[@"service"] = @"MESSAGE_PRIVATE_DETAIL";
+    parameters[@"biz"] = @"111";
+    parameters[@"time"] = @"20180126225600";
+    
+    NSMutableDictionary* paramData = [NSMutableDictionary dictionary];
+    
+    //登录用户名
+    NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+    NSString* loginUsername = [userDef objectForKey:@"loginName"];
+    paramData[@"loginUsername"] = loginUsername;
+    
+    //私信我的某个用户名
+    paramData[@"privMsgUsername"] = self.privMsgUsername;
+    
+    parameters[@"data"] = paramData;
+    
+    NSString* url = ServerURL;
+    NSError* error;
+    NSData* jsonData = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:&error];
+    NSString* jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    
+    //    NSLog(@"jsonString=%@", jsonString);
+    
+    AFURLSessionManager* manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+    
+    NSMutableURLRequest* req = [[AFJSONRequestSerializer serializer] requestWithMethod:@"POST" URLString:url parameters:nil error:nil];
+    
+    req.timeoutInterval = [[[NSUserDefaults standardUserDefaults] valueForKey:@"timeoutInterval"] longValue];
+    
+    [req setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [req setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+    [req setHTTPBody:[jsonString dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    [[manager dataTaskWithRequest:req completionHandler:^(NSURLResponse * _Nonnull response, NSDictionary*  _Nullable responseObject, NSError * _Nullable error) {
+        if(!error){
+            //NSLog(@"Reply JSON: %@", responseObject);
+            [self.privMsgContent removeAllObjects];
+            [self.privMsgContent addObjectsFromArray:[FYCommentData mj_objectArrayWithKeyValuesArray:responseObject[@"privContent"]]];
+            [self.tableView reloadData];
+            
+        } else{
+            NSLog(@"Error: %@, %@, %@", error, response, responseObject);
+        }
+    }] resume];
+}
+
+//懒加载
+- (NSMutableArray<FYCommentData*>*) privMsgContent{
+    
+    if (!_privMsgContent) {
+        
+        _privMsgContent = [NSMutableArray<FYCommentData*> array];
+    }
+    
+    return _privMsgContent;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -32,67 +110,89 @@
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-#warning Incomplete implementation, return the number of sections
-    return 0;
+
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-#warning Incomplete implementation, return the number of rows
-    return 0;
+
+    return self.privMsgContent.count;
 }
 
-/*
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:<#@"reuseIdentifier"#> forIndexPath:indexPath];
+- (FYMessagePrivateDetailCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    // Configure the cell...
+    FYCommentData* privMsg = self.privMsgContent[indexPath.row];
     
-    return cell;
+    //获取登录用户名
+    NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+    NSString* loginUsername = [userDef objectForKey:@"loginName"];
+    
+    FYMessagePrivateDetailCell* msgPrivDetailCell = [tableView dequeueReusableCellWithIdentifier:MessagePrivateDetailID];
+    if (nil == msgPrivDetailCell) {
+        
+        msgPrivDetailCell = [[FYMessagePrivateDetailCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:MessagePrivateDetailID];
+    }
+    
+    UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(clickedHeadIcon:)];
+    
+    
+    //留言用户头像
+    if ([privMsg.commentUsername isEqualToString:loginUsername]) {
+        
+        [msgPrivDetailCell.myUserHeadIcon sd_setImageWithURL:[NSURL URLWithString:privMsg.myHeadIconUrl] completed:nil];
+        msgPrivDetailCell.myUserHeadIcon.layer.cornerRadius = CommentUserHeadIconHeight/2;
+        msgPrivDetailCell.myUserHeadIcon.layer.masksToBounds = YES;
+        
+        //添加头像点击事件
+        [msgPrivDetailCell.myUserHeadIcon addGestureRecognizer:tap];
+        msgPrivDetailCell.myUserHeadIcon.userInteractionEnabled = YES;
+        msgPrivDetailCell.myUserHeadIcon.tag = 2;
+        
+        msgPrivDetailCell.privMsgContent.textAlignment = NSTextAlignmentRight;
+    } else{
+        
+        [msgPrivDetailCell.privMsgUserHeadIcon sd_setImageWithURL:[NSURL URLWithString:self.privMsgUserHeadIconUrl] completed:nil];
+        msgPrivDetailCell.privMsgUserHeadIcon.layer.cornerRadius = CommentUserHeadIconHeight/2;
+        msgPrivDetailCell.privMsgUserHeadIcon.layer.masksToBounds = YES;
+        
+        //添加头像点击事件
+        [msgPrivDetailCell.privMsgUserHeadIcon addGestureRecognizer:tap];
+        msgPrivDetailCell.privMsgUserHeadIcon.userInteractionEnabled = YES;
+        msgPrivDetailCell.privMsgUserHeadIcon.tag = 1;
+        
+        msgPrivDetailCell.privMsgContent.textAlignment = NSTextAlignmentLeft;
+    }
+    
+    //留言时间
+    if (indexPath.row % 2 == 0) {
+        msgPrivDetailCell.placeholderView1.text = privMsg.commentTime;
+        msgPrivDetailCell.placeholderView1.textAlignment = NSTextAlignmentCenter;
+        msgPrivDetailCell.placeholderView1.font = [UIFont systemFontOfSize:10];
+        msgPrivDetailCell.placeholderView1.textColor = [UIColor lightGrayColor];
+    }
+    
+    //留言内容
+    msgPrivDetailCell.privMsgContent.text = privMsg.commentContent;
+    
+    return msgPrivDetailCell;
 }
-*/
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
+- (void) clickedHeadIcon:(UIGestureRecognizer*) tap{
+    
+    NSString* username = @"";
+    
+    if (tap.view.tag == 1) { //留言用户
+        
+        username = self.privMsgUsername;
+    } else if(tap.view.tag == 2) { //我
+        
+        NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+        username = [userDef objectForKey:@"loginName"];
+    }
+    
+    FYPersonalCenterViewController* pcVC = [[FYPersonalCenterViewController alloc] init];
+    pcVC.userName = username;
+    [self.navigationController pushViewController:pcVC animated:YES];
 }
-*/
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

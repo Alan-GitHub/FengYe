@@ -15,6 +15,8 @@
 #import "FYCollectionViewWaterFallLayout.h"
 #import "FYDisplayCell.h"
 #import <UIImageView+WebCache.h>
+#import "FYDetailInfoController.h"
+#import "FYInterestGroupDetailData.h"
 
 #define CollectionViewCellID @"InrstGpDetailCollectionViewCellID"
 
@@ -29,9 +31,12 @@
 @property(nonatomic, retain, readwrite) UICollectionView* collectionView;
 @property(nonatomic, retain, readwrite) FYCollectionViewWaterFallLayout* waterFallLayout;
 @property(nonatomic, retain) UIScrollView* inrstGroupScrollView;
+@property(nonatomic, retain) UILabel* inrstGroupRegardNumsLabel;
+@property(nonatomic, retain) UIView* gDisplayRegardUser;
 
 @property(nonatomic, strong) NSMutableArray<FYWorksUnitData*>* worksUnitArrInrstGpDetail;
 @property(nonatomic, strong) NSMutableArray<FYInterestGroupUnitData*>* interestGroupUnitArrInrstGpDetail;
+@property(nonatomic, strong) FYInterestGroupDetailData* inrstGroupDetailData;
 @end
 
 @implementation FYInterestGroupDetailController
@@ -39,15 +44,20 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+//    NSLog(@"xxx=%zd", self.index);
+    self.navigationItem.title = self.interestGroupUnitData.interestGroupName;
+    
     CGFloat offsetY = 0;
     
     UIScrollView* inrstGroupView = [self getInterestGroupView];
     inrstGroupView.frame = CGRectMake(0, -inrstGroupView.bounds.size.height, ScreenWidth, inrstGroupView.bounds.size.height);
+    inrstGroupView.backgroundColor = MainBackgroundColor;
     [self.collectionView addSubview:inrstGroupView];
     
     offsetY += inrstGroupView.bounds.size.height;
-
+    
     UIView* inrstGroupInfoView = [self getInterestGroupInfo];
+    inrstGroupInfoView.backgroundColor = [UIColor whiteColor];
     inrstGroupInfoView.frame = CGRectMake(0, -offsetY-inrstGroupInfoView.bounds.size.height, ScreenWidth, inrstGroupInfoView.bounds.size.height);
     [self.collectionView addSubview:inrstGroupInfoView];
     
@@ -56,31 +66,35 @@
     [self.view addSubview: self.collectionView];
     self.waterFallLayout.data = self.worksUnitArrInrstGpDetail;
     self.collectionView.contentInset = UIEdgeInsetsMake(offsetY, 0, 0, 0);
+    
     [self loadData];
-//    UIView* view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ScreenWidth, 100)];
-//    view.backgroundColor = [UIColor redColor];
-//    [self.collectionView addSubview:view];
 }
+
 
 - (UIView*) getInterestGroupInfo{
     
+    CGFloat spacing = 10;
     CGFloat offsetY = 0;
     
-    UIView* inrstGroupInfoView = [[UIView alloc] init];
-    inrstGroupInfoView.backgroundColor = [UIColor greenColor];
+    offsetY += spacing;
     
-    UILabel* inrstGroupDesc = [self getInterestGroupDesc];
+    UIView* inrstGroupInfoView = [[UIView alloc] init];
+
+    //兴趣组描述信息
+    UILabel* inrstGroupDesc = [self getInterestGroupDesc: self.interestGroupUnitData.interestGroupDesc];
     inrstGroupDesc.frame = CGRectMake(0, offsetY, ScreenWidth, inrstGroupDesc.bounds.size.height);
     [inrstGroupInfoView addSubview:inrstGroupDesc];
     
-    offsetY += inrstGroupDesc.bounds.size.height;
+    offsetY += inrstGroupDesc.bounds.size.height + spacing;
     
+    //多少人关注了该兴趣组
     UILabel* inrstGroupRegardNums = [self getInterestGroupRegardNums];
     inrstGroupRegardNums.frame = CGRectMake(0, offsetY, ScreenWidth, inrstGroupRegardNums.bounds.size.height);
     [inrstGroupInfoView addSubview:inrstGroupRegardNums];
     
     offsetY += inrstGroupRegardNums.bounds.size.height;
 
+    //关注该兴趣的具体用户
     UIView* usersOfRegard = [self getUsersOfRegardInrstGroup];
     usersOfRegard.frame = CGRectMake(0, offsetY, ScreenWidth, usersOfRegard.bounds.size.height);
     [inrstGroupInfoView addSubview:usersOfRegard];
@@ -92,40 +106,41 @@
     return inrstGroupInfoView;
 }
 
-- (UILabel*) getInterestGroupDesc{
+//获得兴趣组描述信息视图
+- (UILabel*) getInterestGroupDesc: (NSString*) str{
     
     UILabel* label = [[UILabel alloc] init];
     label.numberOfLines = 0;
     
-    label.text = @"fasdfasddlsjldjflsm,vxjkhkhjiuyiyuyutyutututukhjhgkjhkurtyrytrytrytrylkl;k;kl;k;kl;fghfgfhfhfhcm";
+    label.text = str;
     label.textAlignment = NSTextAlignmentCenter;
-    label.font = [UIFont systemFontOfSize:20];
-    
-    CGRect rect = label.frame;
-    rect.size.width = ScreenWidth;
-    label.frame = rect;
-    
+    label.font = [UIFont systemFontOfSize:15];
+    label.textColor = [UIColor grayColor];
     [label sizeToFit];
-    label.backgroundColor = [UIColor redColor];
     
+    CGRect rect = label.bounds;
+    rect.size.width = ScreenWidth;
+    label.bounds = rect;
+
     return label;
 }
 
+//获得关注该兴趣的人头数
 - (UILabel*) getInterestGroupRegardNums{
     
     UILabel* label = [[UILabel alloc] init];
     label.numberOfLines = 0;
     
-    label.text = @"womenjhjhkhk,n,mnmhgjjgjghjbmnjklioytrtrerewesfdfddgfgdr";
+    label.text = @"  ";
     label.textAlignment = NSTextAlignmentCenter;
-    label.font = [UIFont systemFontOfSize:17];
+    label.font = [UIFont systemFontOfSize:10];
+    [label sizeToFit];
     
     CGRect rect = label.bounds;
     rect.size.width = ScreenWidth;
-    label.frame = rect;
-    
-    [label sizeToFit];
-    label.backgroundColor = [UIColor yellowColor];
+    label.bounds = rect;
+
+    self.inrstGroupRegardNumsLabel = label;
     
     return label;
 }
@@ -133,25 +148,26 @@
 - (UIView*) getUsersOfRegardInrstGroup{
     
     CGFloat marginTop = 10;
-    CGFloat spacing = 10;
+//    CGFloat spacing = 10;
     CGFloat headIconSize = 30;
-    CGFloat headIconNums = 6;
+//    CGFloat headIconNums = 6;
     
     UIView* displayRegardUser = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ScreenWidth, marginTop*2 + headIconSize)];
-    displayRegardUser.backgroundColor = [UIColor grayColor];
+//    displayRegardUser.backgroundColor = [UIColorr grayColor];
 
-    CGFloat offsetX = (ScreenWidth - headIconNums * headIconSize - spacing * (headIconNums - 1))/2;
+//    CGFloat offsetX = (ScreenWidth - headIconNums * headIconSize - spacing * (headIconNums - 1))/2;
+//
+//    for (int i = 0; i < headIconNums; i++) {
+//
+//        UIImageView* imageView = [[UIImageView alloc] init];
+//        imageView.frame = CGRectMake(offsetX + (headIconSize + spacing) * i, marginTop, headIconSize, headIconSize);
+//
+//        imageView.backgroundColor = [self randomColor];
+//        imageView.layer.cornerRadius = headIconSize/2;
+//        [displayRegardUser addSubview:imageView];
+//    }
     
-    for (int i = 0; i < headIconNums; i++) {
-        
-        UIImageView* imageView = [[UIImageView alloc] init];
-        imageView.frame = CGRectMake(offsetX + (headIconSize + spacing) * i, marginTop, headIconSize, headIconSize);
-        
-        imageView.backgroundColor = [self randomColor];
-        imageView.layer.cornerRadius = headIconSize/2;
-        [displayRegardUser addSubview:imageView];
-    }
-    
+    self.gDisplayRegardUser = displayRegardUser;
     return displayRegardUser;
 }
 
@@ -170,13 +186,13 @@
     NSMutableDictionary* parameters = [NSMutableDictionary dictionary];
     
     parameters[@"ver"] = @"1";
-    parameters[@"service"] = @"DISCOVER";
+    parameters[@"service"] = @"INTERESTGROUPSELECTED";
     parameters[@"biz"] = @"111";
     parameters[@"time"] = @"20180126225600";
     
     NSMutableDictionary* paramData = [NSMutableDictionary dictionary];
-    paramData[@"count"] = @"15";
-    
+    paramData[@"clickedInrstGroupName"] = self.interestGroupUnitData.interestGroupName;
+
     parameters[@"data"] = paramData;
     
     NSString* url = ServerURL;
@@ -200,16 +216,18 @@
     
     [[manager dataTaskWithRequest:req completionHandler:^(NSURLResponse * _Nonnull response, NSDictionary*  _Nullable responseObject, NSError * _Nullable error) {
         if(!error){
-            //          NSLog(@"Reply JSON: %@", responseObject);
+            //NSLog(@"Reply JSON: %@", responseObject);
+            self.inrstGroupDetailData = [FYInterestGroupDetailData mj_objectWithKeyValues:responseObject[@"groupDetail"]];
+            NSLog(@"self.inrstGroupDetailData=%zd", self.inrstGroupDetailData.numsOfRegardUser);
+            
             [self.worksUnitArrInrstGpDetail addObjectsFromArray:[FYWorksUnitData mj_objectArrayWithKeyValuesArray:responseObject[@"worksUnitData"]]];
             
             [self.interestGroupUnitArrInrstGpDetail addObjectsFromArray:[FYInterestGroupUnitData mj_objectArrayWithKeyValuesArray:responseObject[@"interestGroupUnitData"]]];
             
-            
-            //            NSLog(@"interestGroupUnitArrDisc=%@", self.interestGroupUnitArrDisc);
+            [self specifyInrstGroupLoadData];
             [self inrstGroupLoadData];
             [self.collectionView reloadData];
-            
+        
         } else{
             NSLog(@"Error: %@, %@, %@", error, response, responseObject);
         }
@@ -217,6 +235,14 @@
 }
 
 //懒加载
+- (FYInterestGroupDetailData*) inrstGroupDetailData{
+    if (!_inrstGroupDetailData) {
+        _inrstGroupDetailData = [[FYInterestGroupDetailData alloc] init];
+    }
+    
+    return _inrstGroupDetailData;
+}
+
 - (NSMutableArray*) worksUnitArrInrstGpDetail{
     if(!_worksUnitArrInrstGpDetail){
         _worksUnitArrInrstGpDetail = [NSMutableArray array];
@@ -256,6 +282,34 @@
     return _waterFallLayout;
 }
 
+- (void) specifyInrstGroupLoadData{
+    
+    //the user numbers for regard interest group
+    NSString* str = [NSString stringWithFormat:@"%zd人已关注该兴趣", self.inrstGroupDetailData.numsOfRegardUser];
+    self.inrstGroupRegardNumsLabel.text = str;
+    
+    //head icon
+    CGFloat marginTop = 10;
+    CGFloat spacing = 10;
+    CGFloat headIconSize = 30;
+    
+    NSArray* headIconArr = self.inrstGroupDetailData.headIconOfRegardUser;
+    CGFloat headIconNums = self.inrstGroupDetailData.headIconOfRegardUser.count;
+    
+    CGFloat offsetX = (ScreenWidth - headIconNums * headIconSize - spacing * (headIconNums - 1))/2;
+    
+    for (int i = 0; i < headIconNums; i++) {
+        
+        UIImageView* imageView = [[UIImageView alloc] init];
+        imageView.frame = CGRectMake(offsetX + (headIconSize + spacing) * i, marginTop, headIconSize, headIconSize);
+        [imageView sd_setImageWithURL:[NSURL URLWithString:headIconArr[i]] completed:nil];
+//        imageView.backgroundColor = [self randomColor];
+        imageView.layer.cornerRadius = headIconSize/2;
+        imageView.layer.masksToBounds = YES;
+        [self.gDisplayRegardUser addSubview:imageView];
+    }
+}
+
 - (void) inrstGroupLoadData{
     
     CGFloat imageHeight = 0;
@@ -267,7 +321,7 @@
         
         UIView* inrstGroup = [[UIView alloc] init];
         inrstGroup.frame = CGRectMake(MarginLeft + (InterestGroupSize+MarginIn) * i, MarginTop, InterestGroupSize, InterestGroupSize);
-        inrstGroup.backgroundColor = [self randomColor];
+//        inrstGroup.backgroundColor = [self randomColor];
         inrstGroup.layer.cornerRadius = 15;
         [self.inrstGroupScrollView addSubview:inrstGroup];
         
@@ -289,7 +343,7 @@
         UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(interestGroupClicked:)];
         [inrstGroup addGestureRecognizer:tap];
     }
-    CGFloat tmpWidth = MarginLeft + (InterestGroupSize + MarginIn) * (InterestGroupNumbers-1) + InterestGroupSize + MarginRight;
+    CGFloat tmpWidth = MarginLeft + (InterestGroupSize + MarginIn) * (i-1) + InterestGroupSize + MarginRight;
     self.inrstGroupScrollView.contentSize = CGSizeMake(tmpWidth, 0);
 }
 
@@ -302,24 +356,45 @@
 - (FYDisplayCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     
     FYDisplayCell* cell = (FYDisplayCell*)[collectionView dequeueReusableCellWithReuseIdentifier:CollectionViewCellID forIndexPath:indexPath];
-    
     [cell.workImage sd_setImageWithURL:[NSURL URLWithString:self.worksUnitArrInrstGpDetail[indexPath.item].picURL] completed:nil];
-    cell.zhuanCaiLabel.text = [NSString stringWithFormat:@"%zd", self.worksUnitArrInrstGpDetail[indexPath.item].forwardCount];
-    cell.loveLabel.text = [NSString stringWithFormat:@"%zd", self.worksUnitArrInrstGpDetail[indexPath.item].likeCount];
-    cell.commentLabel.text = [NSString stringWithFormat:@"%zd", self.worksUnitArrInrstGpDetail[indexPath.item].commentCount];
+    
+    FYWorksUnitData* unitData = self.worksUnitArrInrstGpDetail[indexPath.item];
+    //转采数量
+    NSString* zhuanCaiTxt = unitData.forwardCount > 0 ? [NSString stringWithFormat:@"%zd", unitData.forwardCount] : @"";
+    cell.zhuanCaiLabel.text = zhuanCaiTxt;
+    
+    //喜欢数量
+    NSString* loveTxt = unitData.likeCount > 0 ? [NSString stringWithFormat:@"%zd", unitData.likeCount] : @"";
+    cell.loveLabel.text = loveTxt;
+    
+    //评论数量
+    NSString* commentTxt = unitData.commentCount > 0 ? [NSString stringWithFormat:@"%zd", unitData.commentCount] : @"";
+    cell.commentLabel.text = commentTxt;
     
     cell.descriptionLabel.text = self.worksUnitArrInrstGpDetail[indexPath.item].descriptionText;
     [cell.headerIcon sd_setImageWithURL:[NSURL URLWithString:self.worksUnitArrInrstGpDetail[indexPath.item].headIcon] completed:nil];
     cell.usernameLabel.text = self.worksUnitArrInrstGpDetail[indexPath.item].owner;
     cell.workModuleLabel.text = self.worksUnitArrInrstGpDetail[indexPath.item].templateName;
     
+    //重新布局cell
+    [cell layoutIfNeeded];
+    
     return cell;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+    
+    FYDetailInfoController* detail = [[FYDetailInfoController alloc] init];
+    detail.unitData = self.worksUnitArrInrstGpDetail[indexPath.item];
+    
+    [self.navigationController pushViewController:detail animated:YES];
 }
 
 - (void) interestGroupClicked:(UITapGestureRecognizer*) sender{
     
     FYInterestGroupDetailController* detail = [[FYInterestGroupDetailController alloc] init];
-    detail.index = sender.view.tag;
+    //    detail.index = sender.view.tag;
+    detail.interestGroupUnitData = self.interestGroupUnitArrInrstGpDetail[sender.view.tag];
     
     [self.navigationController pushViewController:detail animated:NO];
 }

@@ -10,6 +10,7 @@
 
 @interface FYInterestGroupUnitData : NSObject
 @property(nonatomic, strong) NSString* interestGroupName;
+@property(nonatomic, strong) NSString* interestGroupDesc;
 @property(nonatomic, strong) NSString* coverImageURL;
 @property(nonatomic, assign) NSInteger coverImageWidth;
 @property(nonatomic, assign) NSInteger coverImageHeight;

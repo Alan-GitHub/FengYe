@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13527"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -21,27 +22,27 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jP6-4d-hRh" userLabel="ower">
-                        <rect key="frame" x="0.0" y="196" width="340" height="40"/>
+                        <rect key="frame" x="0.0" y="206" width="340" height="30"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="defaultUserIcon" translatesAutoresizingMaskIntoConstraints="NO" id="Dh8-I7-CgA">
-                                <rect key="frame" x="5" y="0.0" width="40" height="40"/>
+                                <rect key="frame" x="5" y="0.0" width="30" height="30"/>
                                 <color key="backgroundColor" red="1" green="0.2330634761" blue="0.9932119895" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="40" id="OHS-6B-o3j"/>
+                                    <constraint firstAttribute="width" secondItem="Dh8-I7-CgA" secondAttribute="height" multiplier="1:1" id="ACe-ls-ls1"/>
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="string" keyPath="layer.cornerRadius" value="20"/>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="layer.cornerRadius" value="15"/>
                                     <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
                                 </userDefinedRuntimeAttributes>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="username" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f6p-p7-cna">
-                                <rect key="frame" x="55" y="0.0" width="60" height="16"/>
+                                <rect key="frame" x="45" y="0.0" width="60" height="16"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="work" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PYu-Ka-PlS">
-                                <rect key="frame" x="55" y="24" width="29.5" height="16"/>
+                                <rect key="frame" x="45" y="14" width="29.5" height="16"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -50,7 +51,7 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="bottom" secondItem="PYu-Ka-PlS" secondAttribute="bottom" id="0Zl-VP-GZf"/>
-                            <constraint firstAttribute="height" constant="40" id="D1Q-ej-q3I"/>
+                            <constraint firstAttribute="height" constant="30" id="D1Q-ej-q3I"/>
                             <constraint firstItem="Dh8-I7-CgA" firstAttribute="top" secondItem="jP6-4d-hRh" secondAttribute="top" id="F0u-Nm-83D"/>
                             <constraint firstItem="PYu-Ka-PlS" firstAttribute="leading" secondItem="Dh8-I7-CgA" secondAttribute="trailing" constant="10" id="FJH-wt-kNY"/>
                             <constraint firstAttribute="bottom" secondItem="Dh8-I7-CgA" secondAttribute="bottom" id="jBM-fW-Lis"/>
@@ -60,7 +61,7 @@
                         </constraints>
                     </view>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7hk-YP-jd7" userLabel="operation">
-                        <rect key="frame" x="0.0" y="171" width="340" height="20"/>
+                        <rect key="frame" x="0.0" y="181" width="340" height="20"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="G0W-wN-jRv">
                                 <rect key="frame" x="0.0" y="0.0" width="56.5" height="20"/>
@@ -123,11 +124,11 @@
                         </constraints>
                     </view>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="gtJ-Xi-ohJ">
-                        <rect key="frame" x="0.0" y="0.0" width="340" height="161"/>
+                        <rect key="frame" x="0.0" y="0.0" width="340" height="171"/>
                         <color key="backgroundColor" red="0.95975980301051667" green="1" blue="0.22213088003808246" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dDY-Dg-MTA" userLabel="Description">
-                        <rect key="frame" x="0.0" y="166" width="340" height="0.0"/>
+                        <rect key="frame" x="0.0" y="176" width="340" height="0.0"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                         <fontDescription key="fontDescription" type="system" pointSize="13"/>
                         <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -157,6 +158,7 @@
                 <outlet property="commentLabel" destination="x1T-To-PLB" id="rgJ-v3-9nq"/>
                 <outlet property="descriptionLabel" destination="dDY-Dg-MTA" id="BKh-O4-Hys"/>
                 <outlet property="headerIcon" destination="Dh8-I7-CgA" id="fRk-yw-HwQ"/>
+                <outlet property="isOperation" destination="7hk-YP-jd7" id="lFa-KA-1ml"/>
                 <outlet property="loveLabel" destination="oZq-Yb-Pjt" id="ic6-II-VX2"/>
                 <outlet property="usernameLabel" destination="f6p-p7-cna" id="dem-Dd-UN6"/>
                 <outlet property="workImage" destination="gtJ-Xi-ohJ" id="s8D-en-UAG"/>

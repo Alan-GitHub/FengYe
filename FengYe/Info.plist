@@ -51,5 +51,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>选择照片上传</string>
+	<key>NSCameraUsageDescription</key>
+	<string>拍照上传</string>
 </dict>
 </plist>

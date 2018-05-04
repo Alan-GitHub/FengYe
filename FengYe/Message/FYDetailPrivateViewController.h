@@ -10,4 +10,6 @@
 
 @interface FYDetailPrivateViewController : UITableViewController
 
+@property(nonatomic, copy) NSString* privMsgUsername;
+@property(nonatomic, copy) NSString* privMsgUserHeadIconUrl;
 @end

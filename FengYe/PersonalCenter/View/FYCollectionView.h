@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface FYCollectionView : UICollectionView
+@interface FYCollectionView : UICollectionView <UIGestureRecognizerDelegate>
 
 @end

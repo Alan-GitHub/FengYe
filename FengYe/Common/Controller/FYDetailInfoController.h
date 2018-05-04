@@ -12,5 +12,5 @@
 @interface FYDetailInfoController : UIViewController
 
 @property(nonatomic, strong) FYWorksUnitData* unitData;
-//@property(nonatomic, assign) NSInteger index;
+@property(nonatomic, assign) BOOL hasRecommend;
 @end

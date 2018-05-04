@@ -24,7 +24,7 @@
 @property(nonatomic, retain, readwrite) FYCollectionViewWaterFallLayout* waterFallLayout;
 
 //@property(nonatomic, strong) NSArray* heightArr;
-@property(nonatomic, strong) NSMutableArray<FYWorksUnitData*>* worksUnitArr;
+@property(nonatomic, strong) NSMutableArray<FYWorksUnitData*>* worksUnitArrRecomd;
 @end
 
 @implementation FYRecommendViewController
@@ -39,33 +39,12 @@
     
     //collectionView
     [self.view addSubview:self.collectionView];
-    self.waterFallLayout.data = self.worksUnitArr;
+    self.waterFallLayout.data = self.worksUnitArrRecomd;
     
     [self loadData];
 }
 
 - (void) loadData{
-    
-#if TEST
-    FYWorksUnitData* data = [[FYWorksUnitData alloc] init];
-  
-    //data.picURL = @"0.bmp";
-    data.picWidth = 320;
-    data.picHeight = 480;
-    
-    data.uploadTime = 20180201;
-    data.forwardCount = 5;
-    data.likeCount = 5;
-    data.commentCount = 5;
-    
-    data.descriptionText = @"adjflskdlfjlskdioiuoiuoiuojkhkuiouiouuiuijkhkjhgjgjuyuytuytujhkl";
-    //data.headIcon = @"/Users/alanturing/Desktop/FengYe/FengYe/TestImage/1.bmp";
-    data.templateName = @"ss";
-    data.owner = @"alan";
-
-    [self.worksUnitArr addObject:data];
-    return;
-#endif
     
     NSMutableDictionary* parameters = [NSMutableDictionary dictionary];
 
@@ -100,9 +79,8 @@
     
     [[manager dataTaskWithRequest:req completionHandler:^(NSURLResponse * _Nonnull response, NSDictionary*  _Nullable responseObject, NSError * _Nullable error) {
         if(!error){
-//            NSLog(@"Reply JSON: %@", responseObject);
-             [self.worksUnitArr addObjectsFromArray:[FYWorksUnitData mj_objectArrayWithKeyValuesArray:responseObject[@"unitData"]]];
-
+            //NSLog(@"Reply JSON: %@", responseObject);
+            [self.worksUnitArrRecomd addObjectsFromArray:[FYWorksUnitData mj_objectArrayWithKeyValuesArray:responseObject[@"unitData"]]];
             [self.collectionView reloadData];
             
         } else{
@@ -121,12 +99,12 @@
 }
 
 //懒加载
-- (NSMutableArray*) worksUnitArr{
-    if(!_worksUnitArr){
-        _worksUnitArr = [NSMutableArray array];
+- (NSMutableArray*) worksUnitArrRecomd{
+    if(!_worksUnitArrRecomd){
+        _worksUnitArrRecomd = [NSMutableArray array];
     }
     
-    return _worksUnitArr;
+    return _worksUnitArrRecomd;
 }
 
 - (UICollectionView*) collectionView{
@@ -156,19 +134,28 @@
 //UICollectionView代理和数据源方法
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
 
-    return self.worksUnitArr.count;
+    return self.worksUnitArrRecomd.count;
 }
 
 - (FYDisplayCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     
     FYDisplayCell* cell = (FYDisplayCell*)[collectionView dequeueReusableCellWithReuseIdentifier:CollectionViewCellID forIndexPath:indexPath];
 
-    FYWorksUnitData* data = self.worksUnitArr[indexPath.item];
+    FYWorksUnitData* data = self.worksUnitArrRecomd[indexPath.item];
     
     [cell.workImage sd_setImageWithURL:[NSURL URLWithString:data.picURL] completed:nil];
-    cell.zhuanCaiLabel.text = [NSString stringWithFormat:@"%zd", data.forwardCount];
-    cell.loveLabel.text = [NSString stringWithFormat:@"%zd", data.likeCount];
-    cell.commentLabel.text = [NSString stringWithFormat:@"%zd", data.commentCount];
+    
+    //转采数量
+    NSString* zhuanCaiTxt = data.forwardCount > 0 ? [NSString stringWithFormat:@"%zd", data.forwardCount] : @"";
+    cell.zhuanCaiLabel.text = zhuanCaiTxt;
+    
+    //喜欢数量
+    NSString* loveTxt = data.likeCount > 0 ? [NSString stringWithFormat:@"%zd", data.likeCount] : @"";
+    cell.loveLabel.text = loveTxt;
+    
+    //评论数量
+    NSString* commentTxt = data.commentCount > 0 ? [NSString stringWithFormat:@"%zd", data.commentCount] : @"";
+    cell.commentLabel.text = commentTxt;
 
     cell.descriptionLabel.text = data.descriptionText;
     [cell.headerIcon sd_setImageWithURL:[NSURL URLWithString:data.headIcon] completed:nil];
@@ -184,7 +171,8 @@
     
 //    NSLog(@"11");
     FYDetailInfoController* detail = [[FYDetailInfoController alloc] init];
-    detail.unitData = self.worksUnitArr[indexPath.item];
+    detail.unitData = self.worksUnitArrRecomd[indexPath.item];
+    detail.hasRecommend = YES;
     
     [self.navigationController pushViewController:detail animated:YES];
 }

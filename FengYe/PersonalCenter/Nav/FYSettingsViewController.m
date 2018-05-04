@@ -7,6 +7,8 @@
 //
 
 #import "FYSettingsViewController.h"
+#import "FYAbountViewController.h"
+#import "FYTabBarController.h"
 
 #define SettingsTableID @"SettingsTableID"
 
@@ -80,19 +82,56 @@
     switch (section) {
         case 0:
             if (0 == row) {
-                NSLog(@"关于");
+                FYAbountViewController* aboutVC = [[FYAbountViewController alloc] init];
+                [self.navigationController pushViewController:aboutVC animated:YES];
             }
             break;
             
         case 1:
             if (0 == row) {
-                NSLog(@"退出");
+                
+                [self logout];
             }
             break;
             
         default:
             break;
     }
+}
+
+- (void) logout{
+
+    //初始化对话框
+    UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"退出登录" message:@"确认要退出吗？" preferredStyle:UIAlertControllerStyleAlert];
+    
+    //添加确定按钮
+    [alert addAction:[UIAlertAction actionWithTitle:@"退出" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+
+        //1. 清除用户名、密码的存储
+        NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+        [userDef removeObjectForKey:@"loginName"];
+        [userDef removeObjectForKey:@"loginPassword"];
+        [userDef removeObjectForKey:@"isLogin"];
+        
+        //2. pop到前一个视图控制器
+        [self.navigationController popViewControllerAnimated:self];
+        
+        //3. 跳转到app首页
+        FYTabBarController *tabvc =  (FYTabBarController *) [UIApplication sharedApplication].keyWindow.rootViewController;
+        tabvc.selectedIndex = 0;
+        
+        //移除个人中心和动态两个视图控制器
+        //1. 先删除个人中心控制器。  删除后，数组会变化，索引自动向前靠拢
+        //[tabvc.childViewControllers[3] removeFromParentViewController];
+        //2. 后删除动态视图控制器
+        //[tabvc.childViewControllers[2] removeFromParentViewController];
+    }]];
+    
+    //添加取消按钮
+    [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
+    
+    //弹出对话框
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)didReceiveMemoryWarning {

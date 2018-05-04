@@ -10,4 +10,9 @@
 
 @interface FYCommentData : NSObject
 
+@property(nonatomic, copy) NSString* commentUserHeadIconUrl;
+@property(nonatomic, copy) NSString* commentUsername;
+@property(nonatomic, copy) NSString* commentContent;
+@property(nonatomic, copy) NSString* commentTime;
+@property(nonatomic, copy) NSString* myHeadIconUrl;
 @end

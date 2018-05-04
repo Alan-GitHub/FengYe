@@ -7,7 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "FYPersonalCenterViewController.h"
 
 @interface FYCollectionViewController : UIViewController
 
+@property (nonatomic, assign) OffsetType offsetType;
+@property (nonatomic, weak) FYPersonalCenterViewController *mainVC;
+
+@property (nonatomic, copy) NSString* userName;
 @end

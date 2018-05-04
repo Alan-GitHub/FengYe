@@ -10,4 +10,7 @@
 
 @interface FYClickForwardViewController : UIViewController
 
+@property(nonatomic, copy) NSString* picPath;
+@property(nonatomic, copy) NSString* ownUsername;
+@property(nonatomic, copy) NSString* ownDrawName;
 @end

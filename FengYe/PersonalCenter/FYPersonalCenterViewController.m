@@ -22,6 +22,8 @@
 #import "FYPersonalCenterHeaderData.h"
 #import <UIImageView+WebCache.h>
 #import "FYShowAllFansViewController.h"
+#import "FYSettingsViewController.h"
+#import "uploadModel.h"
 
 #define TableViewCell @"TableViewCell"
 
@@ -29,7 +31,7 @@
 
 #define HeadIconHeight 60
 
-@interface FYPersonalCenterViewController ()<UITableViewDataSource, UITableViewDelegate>
+@interface FYPersonalCenterViewController ()<UITableViewDataSource, UITableViewDelegate, UIImagePickerControllerDelegate>
 @property(nonatomic, retain) UITableView* gTableView;
 @property(nonatomic, retain) UIScrollView* gScroView;
 @property(nonatomic, retain) UIView* gPersonInfo;
@@ -45,6 +47,11 @@
 @property(nonatomic, retain) NSMutableArray<UIView*>* gMenuAttr;
 @property(nonatomic, retain) FYPersonalCenterHeaderData* gHeaderData;
 
+//更换头像
+@property(nonatomic, retain) UIImagePickerController* imagePicker;
+@property(nonatomic, retain) uploadModel* gModel;
+@property(nonatomic, retain) UIImageView* gPersonInfoHeadIcon;
+
 @end
 
 @implementation FYPersonalCenterViewController
@@ -52,40 +59,48 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-//    self.view.backgroundColor = [UIColor yellowColor];
     
     UITableView* tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, ScreenWidth, ScreenHeight)];
-//    tableView.backgroundColor = [UIColor redColor];
     tableView.delegate = self;
     tableView.dataSource = self;
     tableView.showsVerticalScrollIndicator = NO;
     [self.view addSubview:tableView];
     self.gTableView = tableView;
-//    tableView.scrollEnabled = NO;
     
     UIView* controlView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ScreenWidth, ControlViewHeight)];
-//    controlView.backgroundColor = [UIColor greenColor];
     tableView.tableHeaderView = controlView;
     self.gControlView = controlView;
     
-    //default select the first menu.
+    //添加设置按钮到右上角
+    [self addNavRightButton];
+    
+    //默认选择第一个菜单.
     self.gPrevClicked = 0;
     
     FYDrawboardViewController* drawboardVC = [[FYDrawboardViewController alloc] init];
     drawboardVC.mainVC = self;
+    drawboardVC.userName = self.userName;
     [self addChildViewController:drawboardVC];
     
     FYCollectionViewController* collectionVC = [[FYCollectionViewController alloc] init];
     collectionVC.mainVC = self;
+    collectionVC.userName = self.userName;
     [self addChildViewController:collectionVC];
 
     FYLikeViewController* likeVC = [[FYLikeViewController alloc] init];
     likeVC.mainVC = self;
+    likeVC.userName = self.userName;
     [self addChildViewController:likeVC];
     
     FYAttentionViewController* attentionVC = [[FYAttentionViewController alloc] init];
+    attentionVC.userName = self.userName;
     attentionVC.mainVC = self;
     [self addChildViewController:attentionVC];
+    
+    self.imagePicker.delegate = self;
+}
+
+- (void)viewWillAppear:(BOOL)animated{
     
     [self loadData];
 }
@@ -101,10 +116,15 @@
     
     NSMutableDictionary* paramData = [NSMutableDictionary dictionary];
     
-    NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
-    NSString* username = [userDef objectForKey:@"loginName"];
-    paramData[@"username"] = username;
-    
+    //加载指定用户的数据 -- 如果没有指定，则加载当前登录用户数据
+    if (self.userName.length) {
+        paramData[@"username"] = self.userName;
+    } else {
+        NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+        NSString* username = [userDef objectForKey:@"loginName"];
+        paramData[@"username"] = username;
+    }
+
     parameters[@"data"] = paramData;
     
     NSString* url = ServerURL;
@@ -124,21 +144,32 @@
     
     [[manager dataTaskWithRequest:req completionHandler:^(NSURLResponse * _Nonnull response, NSDictionary*  _Nullable responseObject, NSError * _Nullable error) {
         if(!error){
-//            NSLog(@"Reply JSON: %@", responseObject);
+            //NSLog(@"Reply JSON: %@", responseObject);
             self.gHeaderData = [FYPersonalCenterHeaderData mj_objectWithKeyValues:responseObject[@"headerData"]];
             [self setupControlView: self.gControlView];
-//            NSLog(@"attentionNum: %zd", self.gHeaderData.attentionNum);
-//            NSLog(@"collectionNum: %zd", self.gHeaderData.collectionNum);
-//            NSLog(@"drawboardNum: %zd", self.gHeaderData.drawboardNum);
-//            NSLog(@"fansNum: %zd", self.gHeaderData.fansNum);
-//            NSLog(@"likeNum: %zd", self.gHeaderData.likeNum);
-//            NSLog(@"headIconURL: %@", self.gHeaderData.headIconURL);
+
         } else{
             NSLog(@"Error: %@, %@, %@", error, response, responseObject);
         }
     }] resume];
 }
 
+- (void) addNavRightButton{
+    
+    UIButton *btn = [UIButton buttonWithType: UIButtonTypeCustom];
+    [btn setBackgroundImage:[UIImage imageNamed:@"mine-setting-iconN"] forState:UIControlStateNormal];
+    [btn sizeToFit];
+    [btn addTarget:self action:@selector(navRightButtonClicked) forControlEvents: UIControlEventTouchUpInside];
+    
+    UIBarButtonItem  *barbtn = [[UIBarButtonItem alloc] initWithCustomView: btn];
+    self.navigationItem.rightBarButtonItem = barbtn;
+}
+
+- (void) navRightButtonClicked{
+    
+    FYSettingsViewController* settingsVC = [[FYSettingsViewController alloc] init];
+    [self.navigationController pushViewController:settingsVC animated:YES];
+}
 
 - (void) setupControlView:(UIView*) controlView{
     
@@ -172,9 +203,18 @@
         make.width.equalTo(personInfo.mas_height);
     }];
     imageView.backgroundColor = [UIColor yellowColor];
+    //加载网络图片之前，先清除缓存
+    [[SDImageCache sharedImageCache] clearMemory];
+    [[SDImageCache sharedImageCache] clearDisk];
     [imageView sd_setImageWithURL:[NSURL URLWithString:self.gHeaderData.headIconURL] completed:nil];
     imageView.layer.cornerRadius = HeadIconHeight/2;
     imageView.layer.masksToBounds = YES;
+    self.gPersonInfoHeadIcon = imageView;
+    
+    //给用户头像添加点击事件
+    UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(changeHeadIcon)];
+    [imageView addGestureRecognizer:tap];
+    imageView.userInteractionEnabled = YES;
     
     //name label
     UILabel* username = [[UILabel alloc] init];
@@ -198,7 +238,7 @@
     fans.font = [UIFont systemFontOfSize:13];
     [fans sizeToFit];
     
-    UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(clickedFansLabel:)];
+    tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(clickedFansLabel:)];
     fans.userInteractionEnabled = YES;
     [fans addGestureRecognizer:tap];
 }
@@ -413,10 +453,13 @@
     
 }
 
-- (void) clickedFansLabel:(id) gesture{
+- (void) clickedFansLabel:(UIGestureRecognizer*) gesture{
     
     FYShowAllFansViewController* fansVC = [[FYShowAllFansViewController alloc] init];
-    [self presentViewController:fansVC animated:YES completion:nil];
+    fansVC.userName = self.userName;
+    
+    [self.navigationController pushViewController:fansVC animated:YES];
+    
 }
 
 - (void) addViewToScrollView:(NSInteger) index{
@@ -454,6 +497,26 @@
     }
     
     return _gHeaderData;
+}
+
+- (UIImagePickerController*) imagePicker{
+    
+    if (!_imagePicker) {
+        
+        _imagePicker = [[UIImagePickerController alloc] init];
+    }
+    
+    return _imagePicker;
+}
+
+- (uploadModel*) gModel{
+    
+    if (!_gModel) {
+        
+        _gModel = [[uploadModel alloc] init];
+    }
+    
+    return _gModel;
 }
 
 //delegate
@@ -543,6 +606,219 @@
     if (childOffsetType == OffsetTypeCenter) {
         scrollView.contentOffset = CGPointMake(scrollView.contentOffset.x, scrollView.contentSize.height-scrollView.bounds.size.height + SystemBottomHeight);
     }
+}
+
+//上传头像的处理
+//弹出头像选择框
+- (void) changeHeadIcon{
+    //底部弹出选择照片控制器
+    UIAlertController* alertContro = [UIAlertController alertControllerWithTitle:@"" message:@"更换头像" preferredStyle: UIAlertControllerStyleActionSheet];
+    
+    //从相册选择
+    UIAlertAction* photoAction = [UIAlertAction actionWithTitle:@"从相册选择" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        
+        self.imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+        self.imagePicker.mediaTypes = @[(NSString*)kUTTypeImage];
+        self.imagePicker.allowsEditing = YES;
+        
+        [self presentViewController:self.imagePicker animated:YES completion:nil];
+    }];
+    
+    //从摄像头获取图片
+    UIAlertAction* cameraAction = [UIAlertAction actionWithTitle:@"拍照" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+            
+            self.imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
+            self.imagePicker.cameraCaptureMode = UIImagePickerControllerCameraCaptureModePhoto;
+            self.imagePicker.cameraDevice = UIImagePickerControllerCameraDeviceRear;
+            self.imagePicker.allowsEditing = YES;
+            
+            [self presentViewController:self.imagePicker animated:YES completion:nil];
+        } else{
+            
+            NSLog(@"没有可用的摄像头");
+        }
+    }];
+    
+    //取消
+    UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+
+    }];
+    
+    [alertContro addAction:photoAction];
+    [alertContro addAction:cameraAction];
+    [alertContro addAction:cancelAction];
+    
+    [self presentViewController:alertContro animated:YES completion:nil];
+}
+
+//UIImagePickerController 代理
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info{
+    
+    [picker dismissViewControllerAnimated:YES completion:nil];
+    
+    //获取用户选择的是照片还是视频
+    NSString* mediaType = info[UIImagePickerControllerMediaType];
+    
+    //如果是照片
+    if ([mediaType isEqualToString:(NSString*)kUTTypeImage]) {
+        
+        //获取编辑后的照片
+        UIImage* tempImage = info[UIImagePickerControllerEditedImage];
+        
+        if (tempImage) {
+            
+            if (picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
+                
+                //将照片存入相册
+                UIImageWriteToSavedPhotosAlbum(tempImage, self, nil, nil);
+            }
+            
+            //获取图片名称
+            NSString* imageName = [NSString stringWithFormat:@"%@_headicon_head.jpg", self.gHeaderData.username];
+            
+            //压缩图片为60 * 60
+            tempImage = [self imageWithImageSimple:tempImage scaledToSize:CGSizeMake(60, 60)];
+            
+            //将图片存入缓存
+            [self saveImage:tempImage toCachePath:[PHOTOCACHEPATH stringByAppendingPathComponent:imageName]];
+            
+            //赋值uploadModel
+            self.gModel.path = [PHOTOCACHEPATH stringByAppendingPathComponent:imageName];
+            self.gModel.name = imageName;
+            self.gModel.type = @"image";
+            self.gModel.isUploaded = NO;
+            
+            //上传图片
+            [self uploadImageBaseModel:self.gModel];
+        }
+    }
+    else{ //其他。-- 视频
+        
+        NSLog(@"其他。-- 视频");
+    }
+}
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker{
+    
+    [picker dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void) uploadImageBaseModel:(uploadModel*) model{
+    
+    //获取文件的后缀名
+    NSString* extension = [model.name componentsSeparatedByString:@"."].lastObject;
+    
+    //设置mimeType
+    NSString* mimeType;
+    if ([model.type isEqualToString:@"image"]) {
+        
+        mimeType = [NSString stringWithFormat:@"image/%@", extension];
+    } else{ //视频
+        
+        mimeType = [NSString stringWithFormat:@"video/%@", extension];
+    }
+    
+    //创建AFHTTPSessionManager
+    AFHTTPSessionManager* manager = [AFHTTPSessionManager manager];
+    
+    //设置响应文件类型为JSON类型
+    manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    
+    //初始化requestSerializer
+    manager.requestSerializer = [AFHTTPRequestSerializer serializer];
+    
+    manager.responseSerializer.acceptableContentTypes = nil;
+    
+    //设置timeout
+    [manager.requestSerializer setTimeoutInterval:20.0];
+    
+    //设置请求头类型
+    [manager.requestSerializer setValue:@"form/data" forHTTPHeaderField:@"Content-Type"];
+    
+    //设置请求头， 授权码
+    //[manager.requestSerializer setValue:@"" forHTTPHeaderField:@"Authentication"];
+    
+    //上传服务器接口
+    NSString* url = ServerURL;
+    
+    //参数
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionary];
+    parameters[@"ver"] = @"1";
+    parameters[@"service"] = @"";
+    parameters[@"biz"] = @"111";
+    parameters[@"time"] = @"20180126225600";
+    
+    NSMutableDictionary* paramData = [NSMutableDictionary dictionary];
+    
+    //用户名
+    paramData[@"username"] = self.gHeaderData.username;
+    paramData[@"picType"] = @"PicTypeHeadIcon";
+    
+    parameters[@"data"] = paramData;
+    
+    //开始上传
+    [manager POST:url parameters:parameters constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+        
+        NSError* error;
+        BOOL ret = [formData appendPartWithFileURL:[NSURL fileURLWithPath:model.path] name:model.name fileName:model.name mimeType:mimeType error:&error];
+        
+        if (!ret) {
+            
+            NSLog(@"appendPartWithFileURL error: %@", error);
+        }
+        
+    } progress:^(NSProgress * _Nonnull uploadProgress) {
+        
+        NSLog(@"上传进度: %f", uploadProgress.fractionCompleted);
+    } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        
+        //NSLog(@"成功返回: %@", responseObject);
+        NSInteger ret = [responseObject[@"retCode"] integerValue];
+        if (ret > 0) {
+
+            [self.gPersonInfoHeadIcon setImage:[UIImage imageWithContentsOfFile:self.gModel.path]];
+        }
+        
+        self.gModel.isUploaded = YES;
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        
+        NSLog(@"上传失败: %@", error);
+        model.isUploaded = NO;
+    }];
+}
+
+//工具方法
+- (void) saveImage:(UIImage*) image toCachePath:(NSString*) path{
+    
+    NSFileManager* fileManager = [NSFileManager defaultManager];
+    if (![fileManager fileExistsAtPath:PHOTOCACHEPATH]) {
+
+        [fileManager createDirectoryAtPath:PHOTOCACHEPATH withIntermediateDirectories:YES attributes:nil error:nil];
+    }else{
+
+    }
+    
+    [UIImageJPEGRepresentation(image, 1) writeToFile:path atomically:YES];
+}
+
+//压缩图片
+- (UIImage*) imageWithImageSimple:(UIImage*) image scaledToSize:(CGSize) newSize{
+    
+    //开启image上下文，画布大小为目标大小
+    UIGraphicsBeginImageContext(newSize);
+    
+    //把原图片画在目标画布上
+    [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    
+    //获取目标画布上的图片
+    UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    //结束image上下文， 释放资源
+    UIGraphicsEndImageContext();
+    
+    //返回画布上的图片
+    return newImage;
 }
 
 - (void)didReceiveMemoryWarning {

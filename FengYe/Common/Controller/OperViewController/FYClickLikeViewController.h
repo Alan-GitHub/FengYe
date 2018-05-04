@@ -10,4 +10,5 @@
 
 @interface FYClickLikeViewController : UIViewController
 
+@property(nonatomic, copy) NSString* picPath;
 @end

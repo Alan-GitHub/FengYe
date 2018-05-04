@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface FYScrollView : UIScrollView
+@interface FYScrollView : UIScrollView <UIGestureRecognizerDelegate>
 
 @end

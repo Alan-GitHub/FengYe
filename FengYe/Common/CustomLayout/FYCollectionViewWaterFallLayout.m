@@ -7,6 +7,7 @@
 //
 
 #import "FYCollectionViewWaterFallLayout.h"
+#import "CommonAttr.h"
 
 #define colMargin 10
 #define rowMargin 10
@@ -14,7 +15,7 @@
 
 //cell elements
 #define Margin 5
-#define HeaderIconHeight 40
+#define HeaderIconHeight CellHeadIconRadius*2
 #define OperationViewHeight 20
 
 @interface FYCollectionViewWaterFallLayout()
@@ -27,17 +28,36 @@
 
 @implementation FYCollectionViewWaterFallLayout
 
-- (CGFloat) cellHeight:(NSIndexPath*) index withWidth:(CGFloat)width{
+- (CGFloat) cellHeight:(NSIndexPath*)index withWidth:(CGFloat)width{
+
     CGFloat cellHeight = 0;
+    FYWorksUnitData* workUnit = self.data[index.item];
     
     //buttom-margin-headerIcon-margin-operation-margin-description-margin-workImage
     cellHeight += Margin + HeaderIconHeight + Margin + OperationViewHeight + Margin;
+    
+    CGSize textMaxSize = CGSizeMake(width, 40);
+    cellHeight += (int)[workUnit.descriptionText boundingRectWithSize:textMaxSize options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName: [UIFont systemFontOfSize: 13]} context:nil].size.height;
+    
+//    cellHeight += Margin;
+//
+//    //有头像才需要预留高度
+//    if (workUnit.headIcon.length) {
+//        cellHeight += HeaderIconHeight + Margin;
+//    }
+//
+//    //有转发、喜欢、评论 才需要预留高度
+//    if (workUnit.forwardCount || workUnit.likeCount || workUnit.commentCount) {
+//        cellHeight += OperationViewHeight + Margin;
+//    }
 
     //description height
-    CGSize textMaxSize = CGSizeMake(width, 40);
-    cellHeight += (int)[self.data[index.item].descriptionText boundingRectWithSize:textMaxSize options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName: [UIFont systemFontOfSize: 13]} context:nil].size.height;
+//    if (workUnit.descriptionText.length) {
+//        CGSize textMaxSize = CGSizeMake(width, 40);
+//        cellHeight += (int)[workUnit.descriptionText boundingRectWithSize:textMaxSize options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName: [UIFont systemFontOfSize: 13]} context:nil].size.height;
+//    }
     
-    cellHeight += width * self.data[index.item].picHeight / self.data[index.item].picWidth;
+    cellHeight += width * workUnit.picHeight / workUnit.picWidth;
     
     return cellHeight;
 }

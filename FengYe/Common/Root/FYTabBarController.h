@@ -9,5 +9,9 @@
 #import <UIKit/UIKit.h>
 
 @interface FYTabBarController : UITabBarController
+//property
+@property(nonatomic, assign) NSInteger tabbarSelectedIndex;
 
+//block
+//@property(nonatomic,copy) void (^tabbarSelectedIndex)(NSInteger index);
 @end

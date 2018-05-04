@@ -7,6 +7,8 @@
 //
 
 #import "FYAbountViewController.h"
+#import "UIView+Frame.h"
+#import "CommonAttr.h"
 
 @interface FYAbountViewController ()
 
@@ -17,21 +19,23 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    
+    self.view.backgroundColor = [UIColor whiteColor];
+    
+    //测试
+    UILabel* testTXT = [[UILabel alloc] initWithFrame:CGRectMake(0, ScreenHeight/3, ScreenWidth, 50)];
+    testTXT.numberOfLines = 0;
+    testTXT.text = @"该软件仅仅是用来测试用，并无任何商业价值.😊";
+    testTXT.font = [UIFont systemFontOfSize:20];
+    testTXT.textAlignment = NSTextAlignmentCenter;
+    testTXT.textColor = [UIColor blackColor];
+    [self.view addSubview:testTXT];
+    
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

@@ -9,5 +9,8 @@
 #import <UIKit/UIKit.h>
 
 @interface FYUsersCell : UICollectionViewCell
+@property (weak, nonatomic) IBOutlet UIImageView *userHeadIcon;
+@property (weak, nonatomic) IBOutlet UILabel *userName;
+@property (weak, nonatomic) IBOutlet UILabel *fansNums;
 
 @end

@@ -18,4 +18,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *headerIcon;
 @property (weak, nonatomic) IBOutlet UILabel *usernameLabel;
 @property (weak, nonatomic) IBOutlet UILabel *workModuleLabel;
+
+@property (weak, nonatomic) IBOutlet UIView *isOperation;
+
 @end

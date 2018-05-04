@@ -68,27 +68,6 @@
 
 - (void) loadData{
     
-#if TEST
-    FYWorksUnitData* data = [[FYWorksUnitData alloc] init];
-    
-    //data.picURL = @"0.bmp";
-    data.picWidth = 320;
-    data.picHeight = 480;
-    
-    data.uploadTime = 20180201;
-    data.forwardCount = 5;
-    data.likeCount = 5;
-    data.commentCount = 5;
-    
-    data.descriptionText = @"adjflskdlfjlskdioiuoiuoiuojkhkuiouiouuiuijkhkjhgjgjuyuytuytujhkl";
-    //data.headIcon = @"/Users/alanturing/Desktop/FengYe/FengYe/TestImage/1.bmp";
-    data.templateName = @"ss";
-    data.owner = @"alan";
-    
-    [self.worksUnitArrDisc addObject:data];
-    return;
-#endif
-    
     NSMutableDictionary* parameters = [NSMutableDictionary dictionary];
     
     parameters[@"ver"] = @"1";
@@ -249,7 +228,8 @@
 - (void) interestGroupClicked:(UITapGestureRecognizer*) sender{
     
     FYInterestGroupDetailController* detail = [[FYInterestGroupDetailController alloc] init];
-    detail.index = sender.view.tag;
+//    detail.index = sender.view.tag;
+    detail.interestGroupUnitData = self.interestGroupUnitArrDisc[sender.view.tag];
     
     [self.navigationController pushViewController:detail animated:NO];
 }
@@ -267,9 +247,18 @@
     FYWorksUnitData* data = self.worksUnitArrDisc[indexPath.item];
     
     [cell.workImage sd_setImageWithURL:[NSURL URLWithString:data.picURL] completed:nil];
-    cell.zhuanCaiLabel.text = [NSString stringWithFormat:@"%zd", data.forwardCount];
-    cell.loveLabel.text = [NSString stringWithFormat:@"%zd", data.likeCount];
-    cell.commentLabel.text = [NSString stringWithFormat:@"%zd", data.commentCount];
+    
+    //转采数量
+    NSString* zhuanCaiTxt = data.forwardCount > 0 ? [NSString stringWithFormat:@"%zd", data.forwardCount] : @"";
+    cell.zhuanCaiLabel.text = zhuanCaiTxt;
+    
+    //喜欢数量
+    NSString* loveTxt = data.likeCount > 0 ? [NSString stringWithFormat:@"%zd", data.likeCount] : @"";
+    cell.loveLabel.text = loveTxt;
+    
+    //评论数量
+    NSString* commentTxt = data.commentCount > 0 ? [NSString stringWithFormat:@"%zd", data.commentCount] : @"";
+    cell.commentLabel.text = commentTxt;
 
     cell.descriptionLabel.text = data.descriptionText;
     [cell.headerIcon sd_setImageWithURL:[NSURL URLWithString:data.headIcon] completed:nil];
@@ -286,6 +275,7 @@
     
     FYDetailInfoController* detail = [[FYDetailInfoController alloc] init];
     detail.unitData = self.worksUnitArrDisc[indexPath.item];
+    detail.hasRecommend = YES;
     
     [self.navigationController pushViewController:detail animated:YES];
 }

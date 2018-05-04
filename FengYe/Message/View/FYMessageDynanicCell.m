@@ -33,7 +33,7 @@
         
         //评论用户头像
         [self.contentView addSubview:self.commentUserHeadIcon];
-        self.commentUserHeadIcon.backgroundColor = [UIColor greenColor];
+//        self.commentUserHeadIcon.backgroundColor = [UIColor greenColor];
         [self.commentUserHeadIcon mas_makeConstraints:^(MASConstraintMaker *make) {
             make.top.equalTo(self.contentView.mas_top).with.offset(Spacing);
             make.left.equalTo(self.contentView.mas_left).with.offset(Spacing);
@@ -43,7 +43,7 @@
         
         //用户名关注
         [self.contentView addSubview:self.commentUsername];
-        self.commentUsername.backgroundColor = [UIColor redColor];
+//        self.commentUsername.backgroundColor = [UIColor redColor];
         [self.commentUsername mas_makeConstraints:^(MASConstraintMaker *make) {
             make.top.equalTo(self.commentUserHeadIcon.mas_top).with.offset(0);
             make.left.equalTo(self.commentUserHeadIcon.mas_right).with.offset(Spacing*2);
@@ -53,17 +53,17 @@
         
         //时间
         [self.contentView addSubview:self.commentTime];
-        self.commentTime.backgroundColor = [UIColor grayColor];
+//        self.commentTime.backgroundColor = [UIColor grayColor];
         [self.commentTime mas_makeConstraints:^(MASConstraintMaker *make) {
             make.left.equalTo(self.commentUsername.mas_left).with.offset(0);
-            make.bottom.equalTo(self.contentView.mas_bottom).with.offset(-5);
+            make.bottom.equalTo(self.contentView.mas_bottom).with.offset(-Spacing*2);
             make.right.equalTo(self.commentUsername.mas_right).with.offset(0);
             make.height.mas_equalTo(Spacing);
         }];
         
         //被评论用户的头像
         [self.contentView addSubview:self.myHeadIcon];
-        self.myHeadIcon.backgroundColor = [UIColor greenColor];
+//        self.myHeadIcon.backgroundColor = [UIColor greenColor];
         [self.myHeadIcon mas_makeConstraints:^(MASConstraintMaker *make) {
             make.top.equalTo(self.commentUserHeadIcon.mas_top).with.offset(0);
             make.right.equalTo(self.contentView.mas_right).with.offset(-Spacing);

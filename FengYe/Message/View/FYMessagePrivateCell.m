@@ -31,7 +31,7 @@
         
         //头像
         [self.contentView addSubview:self.privMsgUserHeadIcon];
-        self.privMsgUserHeadIcon.backgroundColor = [UIColor greenColor];
+//        self.privMsgUserHeadIcon.backgroundColor = [UIColor greenColor];
         [self.privMsgUserHeadIcon mas_makeConstraints:^(MASConstraintMaker *make) {
             make.top.equalTo(self.contentView.mas_top).with.offset(Spacing);
             make.left.equalTo(self.contentView.mas_left).with.offset(Spacing);
@@ -41,7 +41,7 @@
         
         //用户名
         [self.contentView addSubview:self.privMsgUsername];
-        self.privMsgUsername.backgroundColor = [UIColor redColor];
+//        self.privMsgUsername.backgroundColor = [UIColor redColor];
         [self.privMsgUsername mas_makeConstraints:^(MASConstraintMaker *make) {
             make.top.equalTo(self.privMsgUserHeadIcon.mas_top).with.offset(0);
             make.left.equalTo(self.privMsgUserHeadIcon.mas_right).with.offset(Spacing*2);
@@ -51,7 +51,7 @@
         
         //时间
         [self.contentView addSubview:self.privMsgTime];
-        self.privMsgTime.backgroundColor = [UIColor grayColor];
+//        self.privMsgTime.backgroundColor = [UIColor grayColor];
         [self.privMsgTime mas_makeConstraints:^(MASConstraintMaker *make) {
             make.left.equalTo(self.privMsgUsername.mas_left).with.offset(0);
             make.bottom.equalTo(self.contentView.mas_bottom).with.offset(-5);
@@ -61,7 +61,7 @@
         
         //内容
         [self.contentView addSubview:self.privMsgContent];
-        self.privMsgContent.backgroundColor = [UIColor yellowColor];
+//        self.privMsgContent.backgroundColor = [UIColor yellowColor];
         [self.privMsgContent mas_makeConstraints:^(MASConstraintMaker *make) {
             make.top.equalTo(self.privMsgUsername.mas_bottom).with.offset(3);
             make.left.equalTo(self.privMsgUsername.mas_left).with.offset(0);

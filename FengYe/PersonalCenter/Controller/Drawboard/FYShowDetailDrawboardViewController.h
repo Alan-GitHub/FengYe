@@ -7,7 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "FYDrawboardCellUnitData.h"
 
 @interface FYShowDetailDrawboardViewController : UIViewController
 
+@property(nonatomic, retain) FYDrawboardCellUnitData* specifyDrawData;
+@property(nonatomic, copy) NSString* userName;
 @end

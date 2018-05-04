@@ -7,7 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "FYInterestGroupUnitData.h"
 
 @interface FYShowAllInterestCellViewController : UIViewController
 
+@property(nonatomic, retain) NSMutableArray<FYInterestGroupUnitData*>* allInterestCellAttr;
 @end

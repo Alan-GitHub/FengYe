@@ -17,7 +17,8 @@
 		370D0B3F1FDCF0B4004263E4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 370D0B3E1FDCF0B4004263E4 /* main.m */; };
 		370D0B471FDD0712004263E4 /* FYTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 370D0B461FDD0712004263E4 /* FYTabBarController.m */; };
 		370D0B4A1FDD145D004263E4 /* FYMessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 370D0B491FDD145D004263E4 /* FYMessageViewController.m */; };
-		370D0B4D1FDD1485004263E4 /* FYPersonalCenterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 370D0B4C1FDD1485004263E4 /* FYPersonalCenterViewController.m */; };
+		371FAFC7208F798900B90453 /* uploadModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 371FAFC6208F798900B90453 /* uploadModel.m */; };
+		3722CE14208B3C9900368F05 /* FYMessagePrivateDetailCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3722CE13208B3C9900368F05 /* FYMessagePrivateDetailCell.m */; };
 		3739CACD1FE2CE9000CCA000 /* 15.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 3739CABE1FE2CE8F00CCA000 /* 15.bmp */; };
 		3739CACE1FE2CE9000CCA000 /* 14.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 3739CABF1FE2CE8F00CCA000 /* 14.bmp */; };
 		3739CACF1FE2CE9000CCA000 /* 3.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 3739CAC01FE2CE8F00CCA000 /* 3.bmp */; };
@@ -33,17 +34,56 @@
 		3739CAD91FE2CE9000CCA000 /* 9.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 3739CACA1FE2CE9000CCA000 /* 9.bmp */; };
 		3739CADA1FE2CE9000CCA000 /* 12.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 3739CACB1FE2CE9000CCA000 /* 12.bmp */; };
 		3739CADB1FE2CE9000CCA000 /* 11.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 3739CACC1FE2CE9000CCA000 /* 11.bmp */; };
-		379B0550200F8C7E00A690C1 /* FYPersonalCenterHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 379B054F200F8C7E00A690C1 /* FYPersonalCenterHeader.m */; };
+		378EC32F205CC5F1003578D3 /* FYUsersCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 378EC32D205CC5F1003578D3 /* FYUsersCell.m */; };
+		378EC330205CC5F1003578D3 /* FYUsersCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 378EC32E205CC5F1003578D3 /* FYUsersCell.xib */; };
+		378EC333205CCEF8003578D3 /* FYScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 378EC332205CCEF8003578D3 /* FYScrollView.m */; };
+		37A2B714206EA641000E0C67 /* FYPersonalCenterHeaderData.m in Sources */ = {isa = PBXBuildFile; fileRef = 37A2B713206EA641000E0C67 /* FYPersonalCenterHeaderData.m */; };
+		37A72B60206757DB009975E1 /* FYDrawboardCellAdd.m in Sources */ = {isa = PBXBuildFile; fileRef = 37A72B5E206757DB009975E1 /* FYDrawboardCellAdd.m */; };
+		37A72B61206757DB009975E1 /* FYDrawboardCellAdd.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37A72B5F206757DB009975E1 /* FYDrawboardCellAdd.xib */; };
+		37AAEB53208AF2EE000D5E8D /* FYDetailPrivateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37AAEB52208AF2EE000D5E8D /* FYDetailPrivateViewController.m */; };
+		37AEED502072911700D64F1A /* FYShowAllFansViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37AEED4F2072911700D64F1A /* FYShowAllFansViewController.m */; };
+		37B06DBA207E3CA4009B2AF5 /* FYAbountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37B06DB9207E3CA4009B2AF5 /* FYAbountViewController.m */; };
+		37B2FCDC20640E9F00E86A97 /* FYDrawboardCellUnitData.m in Sources */ = {isa = PBXBuildFile; fileRef = 37B2FCDB20640E9F00E86A97 /* FYDrawboardCellUnitData.m */; };
+		37B2FCDF2064132C00E86A97 /* FYUserCellData.m in Sources */ = {isa = PBXBuildFile; fileRef = 37B2FCDE2064132C00E86A97 /* FYUserCellData.m */; };
+		37B4B44E206A8398006BB958 /* UITextView+Placeholder.m in Sources */ = {isa = PBXBuildFile; fileRef = 37B4B44D206A8398006BB958 /* UITextView+Placeholder.m */; };
+		37B4C3A1208E31BC0099EDD1 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37B4C3A0208E31AC0099EDD1 /* MobileCoreServices.framework */; };
+		37B70F642088EB7E00CF7397 /* FYMessagePrivateCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 37B70F632088EB7E00CF7397 /* FYMessagePrivateCell.m */; };
+		37C154092066470E00820E27 /* FYShowAllDrawboardCellViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37C154082066470E00820E27 /* FYShowAllDrawboardCellViewController.m */; };
+		37C1540C2066473B00820E27 /* FYShowAllInterestCellViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37C1540B2066473B00820E27 /* FYShowAllInterestCellViewController.m */; };
+		37C1540F2066475500820E27 /* FYShowAllAttentionUserCellViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37C1540E2066475500820E27 /* FYShowAllAttentionUserCellViewController.m */; };
+		37ED2083205514B700B664AD /* FYDrawboardCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 37ED2081205514B700B664AD /* FYDrawboardCell.m */; };
+		37ED2084205514B700B664AD /* FYDrawboardCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37ED2082205514B700B664AD /* FYDrawboardCell.xib */; };
+		37EDBEAF204AA7C400B9A984 /* FYPersonalCenterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37EDBEAE204AA7C400B9A984 /* FYPersonalCenterViewController.m */; };
+		37EE18062084F88E0070BD04 /* FYCommentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 37EE18052084F88E0070BD04 /* FYCommentCell.m */; };
+		37EEDD63206941B500926C56 /* FYNewDrawboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37EEDD62206941B500926C56 /* FYNewDrawboardViewController.m */; };
+		37EF1C4E2075D2F5007D340E /* FYShowDetailDrawboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37EF1C4D2075D2F5007D340E /* FYShowDetailDrawboardViewController.m */; };
+		37EF1C512075F1E3007D340E /* UIView+Frame.m in Sources */ = {isa = PBXBuildFile; fileRef = 37EF1C502075F1E3007D340E /* UIView+Frame.m */; };
+		37EF3EDD2086557D00E1983A /* FYCommentData.m in Sources */ = {isa = PBXBuildFile; fileRef = 37EF3EDC2086557D00E1983A /* FYCommentData.m */; };
+		37EFD59320598A630031CD9B /* FYCollectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 37EFD59220598A630031CD9B /* FYCollectionView.m */; };
+		37F01699205C9D58007F39F8 /* FYModuleCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F01697205C9D58007F39F8 /* FYModuleCell.m */; };
+		37F0169A205C9D58007F39F8 /* FYModuleCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37F01698205C9D58007F39F8 /* FYModuleCell.xib */; };
+		37F0169E205CA807007F39F8 /* FYInterestingCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F0169C205CA807007F39F8 /* FYInterestingCell.m */; };
+		37F0169F205CA807007F39F8 /* FYInterestingCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37F0169D205CA807007F39F8 /* FYInterestingCell.xib */; };
+		37F04DFF20878AC7009B6B24 /* FYMessageDynanicCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F04DFE20878AC7009B6B24 /* FYMessageDynanicCell.m */; };
 		37F08A97202732E400429C90 /* FYInterestGroupUnitData.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F08A96202732E400429C90 /* FYInterestGroupUnitData.m */; };
 		37F08A9D20275E1E00429C90 /* FYInterestGroupDetailController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F08A9C20275E1E00429C90 /* FYInterestGroupDetailController.m */; };
+		37F097C92056D554004D34D8 /* FYDrawboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F097C82056D554004D34D8 /* FYDrawboardViewController.m */; };
+		37F097D02056D5CB004D34D8 /* FYCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F097CF2056D5CB004D34D8 /* FYCollectionViewController.m */; };
+		37F097D32056D5EA004D34D8 /* FYLikeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F097D22056D5EA004D34D8 /* FYLikeViewController.m */; };
+		37F097D62056D607004D34D8 /* FYAttentionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F097D52056D607004D34D8 /* FYAttentionViewController.m */; };
+		37F099F82045B00A00C8028C /* FYInterestGroupDetailData.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F099F72045B00A00C8028C /* FYInterestGroupDetailData.m */; };
+		37F0AED5208346FC000B5F0D /* FYClickForwardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F0AED4208346FC000B5F0D /* FYClickForwardViewController.m */; };
+		37F0AED82083A411000B5F0D /* FYClickCommentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F0AED72083A411000B5F0D /* FYClickCommentViewController.m */; };
 		37F1D6572000FB8B00709D37 /* FYLoginRegisterController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37F1D6512000FB8B00709D37 /* FYLoginRegisterController.xib */; };
 		37F1D6592000FB8B00709D37 /* FYLoginRegisterController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F1D6542000FB8B00709D37 /* FYLoginRegisterController.m */; };
 		37F1D65E2000FBFD00709D37 /* FYLoginRegisterView.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F1D65C2000FBFD00709D37 /* FYLoginRegisterView.m */; };
 		37F1D65F2000FBFD00709D37 /* FYLoginRegisterView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37F1D65D2000FBFD00709D37 /* FYLoginRegisterView.xib */; };
+		37F2100620774E6C00E13DD4 /* FYDetailDrawboardColleCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F2100420774E6C00E13DD4 /* FYDetailDrawboardColleCell.m */; };
+		37F2100720774E6C00E13DD4 /* FYDetailDrawboardColleCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37F2100520774E6C00E13DD4 /* FYDetailDrawboardColleCell.xib */; };
+		37F21393207D0D7200271C90 /* FYSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F21392207D0D7200271C90 /* FYSettingsViewController.m */; };
+		37F2314720819DBA00BFDCD4 /* FYClickLikeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F2314620819DBA00BFDCD4 /* FYClickLikeViewController.m */; };
+		37F2314D2082051E00BFDCD4 /* FYSelectDrawNameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F2314C2082051E00BFDCD4 /* FYSelectDrawNameViewController.m */; };
 		37F28E5A20142A75003B07BD /* FYDetailInfoController.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F28E5920142A75003B07BD /* FYDetailInfoController.m */; };
-		37F3CB19200BAA4D00A2D1B3 /* Test.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F3CB18200BAA4D00A2D1B3 /* Test.m */; };
-		37F3CB1B200BAA5800A2D1B3 /* Test.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37F3CB1A200BAA5800A2D1B3 /* Test.xib */; };
-		37F3CB1D200BAC7100A2D1B3 /* FYPersonalCenterHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37F3CB1C200BAC7100A2D1B3 /* FYPersonalCenterHeader.xib */; };
 		37F4DB7E202B5EC80034E23F /* FYDisplayCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37F4DB7D202B5EC80034E23F /* FYDisplayCell.xib */; };
 		37F6522A201B838500B036C1 /* FYWorksUnitData.m in Sources */ = {isa = PBXBuildFile; fileRef = 37F65229201B838500B036C1 /* FYWorksUnitData.m */; };
 		37F7B9D41FE6115E00756CA7 /* 0.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 37F7B9D31FE6115E00756CA7 /* 0.bmp */; };
@@ -68,8 +108,10 @@
 		370D0B461FDD0712004263E4 /* FYTabBarController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYTabBarController.m; sourceTree = "<group>"; };
 		370D0B481FDD145D004263E4 /* FYMessageViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYMessageViewController.h; sourceTree = "<group>"; };
 		370D0B491FDD145D004263E4 /* FYMessageViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYMessageViewController.m; sourceTree = "<group>"; };
-		370D0B4B1FDD1485004263E4 /* FYPersonalCenterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYPersonalCenterViewController.h; sourceTree = "<group>"; };
-		370D0B4C1FDD1485004263E4 /* FYPersonalCenterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYPersonalCenterViewController.m; sourceTree = "<group>"; };
+		371FAFC5208F798900B90453 /* uploadModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = uploadModel.h; sourceTree = "<group>"; };
+		371FAFC6208F798900B90453 /* uploadModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = uploadModel.m; sourceTree = "<group>"; };
+		3722CE12208B3C9900368F05 /* FYMessagePrivateDetailCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYMessagePrivateDetailCell.h; sourceTree = "<group>"; };
+		3722CE13208B3C9900368F05 /* FYMessagePrivateDetailCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYMessagePrivateDetailCell.m; sourceTree = "<group>"; };
 		3739CABE1FE2CE8F00CCA000 /* 15.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = 15.bmp; sourceTree = "<group>"; };
 		3739CABF1FE2CE8F00CCA000 /* 14.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = 14.bmp; sourceTree = "<group>"; };
 		3739CAC01FE2CE8F00CCA000 /* 3.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = 3.bmp; sourceTree = "<group>"; };
@@ -85,24 +127,97 @@
 		3739CACA1FE2CE9000CCA000 /* 9.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = 9.bmp; sourceTree = "<group>"; };
 		3739CACB1FE2CE9000CCA000 /* 12.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = 12.bmp; sourceTree = "<group>"; };
 		3739CACC1FE2CE9000CCA000 /* 11.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = 11.bmp; sourceTree = "<group>"; };
-		379B054E200F8C7E00A690C1 /* FYPersonalCenterHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYPersonalCenterHeader.h; sourceTree = "<group>"; };
-		379B054F200F8C7E00A690C1 /* FYPersonalCenterHeader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYPersonalCenterHeader.m; sourceTree = "<group>"; };
+		378EC32C205CC5F1003578D3 /* FYUsersCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYUsersCell.h; sourceTree = "<group>"; };
+		378EC32D205CC5F1003578D3 /* FYUsersCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYUsersCell.m; sourceTree = "<group>"; };
+		378EC32E205CC5F1003578D3 /* FYUsersCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FYUsersCell.xib; sourceTree = "<group>"; };
+		378EC331205CCEF8003578D3 /* FYScrollView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYScrollView.h; sourceTree = "<group>"; };
+		378EC332205CCEF8003578D3 /* FYScrollView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYScrollView.m; sourceTree = "<group>"; };
+		37A2B712206EA641000E0C67 /* FYPersonalCenterHeaderData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYPersonalCenterHeaderData.h; sourceTree = "<group>"; };
+		37A2B713206EA641000E0C67 /* FYPersonalCenterHeaderData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYPersonalCenterHeaderData.m; sourceTree = "<group>"; };
+		37A72B5D206757DB009975E1 /* FYDrawboardCellAdd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYDrawboardCellAdd.h; sourceTree = "<group>"; };
+		37A72B5E206757DB009975E1 /* FYDrawboardCellAdd.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYDrawboardCellAdd.m; sourceTree = "<group>"; };
+		37A72B5F206757DB009975E1 /* FYDrawboardCellAdd.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FYDrawboardCellAdd.xib; sourceTree = "<group>"; };
+		37AAEB51208AF2EE000D5E8D /* FYDetailPrivateViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYDetailPrivateViewController.h; sourceTree = "<group>"; };
+		37AAEB52208AF2EE000D5E8D /* FYDetailPrivateViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYDetailPrivateViewController.m; sourceTree = "<group>"; };
+		37AEED4E2072911700D64F1A /* FYShowAllFansViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYShowAllFansViewController.h; sourceTree = "<group>"; };
+		37AEED4F2072911700D64F1A /* FYShowAllFansViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYShowAllFansViewController.m; sourceTree = "<group>"; };
+		37B06DB8207E3CA4009B2AF5 /* FYAbountViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYAbountViewController.h; sourceTree = "<group>"; };
+		37B06DB9207E3CA4009B2AF5 /* FYAbountViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYAbountViewController.m; sourceTree = "<group>"; };
+		37B2FCDA20640E9F00E86A97 /* FYDrawboardCellUnitData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYDrawboardCellUnitData.h; sourceTree = "<group>"; };
+		37B2FCDB20640E9F00E86A97 /* FYDrawboardCellUnitData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYDrawboardCellUnitData.m; sourceTree = "<group>"; };
+		37B2FCDD2064132C00E86A97 /* FYUserCellData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYUserCellData.h; sourceTree = "<group>"; };
+		37B2FCDE2064132C00E86A97 /* FYUserCellData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYUserCellData.m; sourceTree = "<group>"; };
+		37B4B44C206A8398006BB958 /* UITextView+Placeholder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UITextView+Placeholder.h"; sourceTree = "<group>"; };
+		37B4B44D206A8398006BB958 /* UITextView+Placeholder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UITextView+Placeholder.m"; sourceTree = "<group>"; };
+		37B4C3A0208E31AC0099EDD1 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		37B70F622088EB7E00CF7397 /* FYMessagePrivateCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYMessagePrivateCell.h; sourceTree = "<group>"; };
+		37B70F632088EB7E00CF7397 /* FYMessagePrivateCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYMessagePrivateCell.m; sourceTree = "<group>"; };
+		37C154072066470E00820E27 /* FYShowAllDrawboardCellViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYShowAllDrawboardCellViewController.h; sourceTree = "<group>"; };
+		37C154082066470E00820E27 /* FYShowAllDrawboardCellViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYShowAllDrawboardCellViewController.m; sourceTree = "<group>"; };
+		37C1540A2066473B00820E27 /* FYShowAllInterestCellViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYShowAllInterestCellViewController.h; sourceTree = "<group>"; };
+		37C1540B2066473B00820E27 /* FYShowAllInterestCellViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYShowAllInterestCellViewController.m; sourceTree = "<group>"; };
+		37C1540D2066475500820E27 /* FYShowAllAttentionUserCellViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYShowAllAttentionUserCellViewController.h; sourceTree = "<group>"; };
+		37C1540E2066475500820E27 /* FYShowAllAttentionUserCellViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYShowAllAttentionUserCellViewController.m; sourceTree = "<group>"; };
+		37ED2080205514B700B664AD /* FYDrawboardCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYDrawboardCell.h; sourceTree = "<group>"; };
+		37ED2081205514B700B664AD /* FYDrawboardCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYDrawboardCell.m; sourceTree = "<group>"; };
+		37ED2082205514B700B664AD /* FYDrawboardCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FYDrawboardCell.xib; sourceTree = "<group>"; };
+		37EDBEAD204AA7C400B9A984 /* FYPersonalCenterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYPersonalCenterViewController.h; sourceTree = "<group>"; };
+		37EDBEAE204AA7C400B9A984 /* FYPersonalCenterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYPersonalCenterViewController.m; sourceTree = "<group>"; };
+		37EE18042084F88E0070BD04 /* FYCommentCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYCommentCell.h; sourceTree = "<group>"; };
+		37EE18052084F88E0070BD04 /* FYCommentCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYCommentCell.m; sourceTree = "<group>"; };
+		37EEDD61206941B500926C56 /* FYNewDrawboardViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYNewDrawboardViewController.h; sourceTree = "<group>"; };
+		37EEDD62206941B500926C56 /* FYNewDrawboardViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYNewDrawboardViewController.m; sourceTree = "<group>"; };
+		37EF1C4C2075D2F5007D340E /* FYShowDetailDrawboardViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYShowDetailDrawboardViewController.h; sourceTree = "<group>"; };
+		37EF1C4D2075D2F5007D340E /* FYShowDetailDrawboardViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYShowDetailDrawboardViewController.m; sourceTree = "<group>"; };
+		37EF1C4F2075F1E3007D340E /* UIView+Frame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Frame.h"; sourceTree = "<group>"; };
+		37EF1C502075F1E3007D340E /* UIView+Frame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Frame.m"; sourceTree = "<group>"; };
+		37EF3EDB2086557D00E1983A /* FYCommentData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYCommentData.h; sourceTree = "<group>"; };
+		37EF3EDC2086557D00E1983A /* FYCommentData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYCommentData.m; sourceTree = "<group>"; };
+		37EFD59120598A630031CD9B /* FYCollectionView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYCollectionView.h; sourceTree = "<group>"; };
+		37EFD59220598A630031CD9B /* FYCollectionView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYCollectionView.m; sourceTree = "<group>"; };
+		37F01696205C9D58007F39F8 /* FYModuleCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYModuleCell.h; sourceTree = "<group>"; };
+		37F01697205C9D58007F39F8 /* FYModuleCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYModuleCell.m; sourceTree = "<group>"; };
+		37F01698205C9D58007F39F8 /* FYModuleCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FYModuleCell.xib; sourceTree = "<group>"; };
+		37F0169B205CA807007F39F8 /* FYInterestingCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYInterestingCell.h; sourceTree = "<group>"; };
+		37F0169C205CA807007F39F8 /* FYInterestingCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYInterestingCell.m; sourceTree = "<group>"; };
+		37F0169D205CA807007F39F8 /* FYInterestingCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FYInterestingCell.xib; sourceTree = "<group>"; };
+		37F04DFD20878AC7009B6B24 /* FYMessageDynanicCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYMessageDynanicCell.h; sourceTree = "<group>"; };
+		37F04DFE20878AC7009B6B24 /* FYMessageDynanicCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYMessageDynanicCell.m; sourceTree = "<group>"; };
 		37F08A95202732E400429C90 /* FYInterestGroupUnitData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYInterestGroupUnitData.h; sourceTree = "<group>"; };
 		37F08A96202732E400429C90 /* FYInterestGroupUnitData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYInterestGroupUnitData.m; sourceTree = "<group>"; };
 		37F08A9B20275E1E00429C90 /* FYInterestGroupDetailController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYInterestGroupDetailController.h; sourceTree = "<group>"; };
 		37F08A9C20275E1E00429C90 /* FYInterestGroupDetailController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYInterestGroupDetailController.m; sourceTree = "<group>"; };
+		37F097C72056D554004D34D8 /* FYDrawboardViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYDrawboardViewController.h; sourceTree = "<group>"; };
+		37F097C82056D554004D34D8 /* FYDrawboardViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYDrawboardViewController.m; sourceTree = "<group>"; };
+		37F097CE2056D5CB004D34D8 /* FYCollectionViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYCollectionViewController.h; sourceTree = "<group>"; };
+		37F097CF2056D5CB004D34D8 /* FYCollectionViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYCollectionViewController.m; sourceTree = "<group>"; };
+		37F097D12056D5EA004D34D8 /* FYLikeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYLikeViewController.h; sourceTree = "<group>"; };
+		37F097D22056D5EA004D34D8 /* FYLikeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYLikeViewController.m; sourceTree = "<group>"; };
+		37F097D42056D607004D34D8 /* FYAttentionViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYAttentionViewController.h; sourceTree = "<group>"; };
+		37F097D52056D607004D34D8 /* FYAttentionViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYAttentionViewController.m; sourceTree = "<group>"; };
+		37F099F62045B00A00C8028C /* FYInterestGroupDetailData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYInterestGroupDetailData.h; sourceTree = "<group>"; };
+		37F099F72045B00A00C8028C /* FYInterestGroupDetailData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYInterestGroupDetailData.m; sourceTree = "<group>"; };
+		37F0AED3208346FC000B5F0D /* FYClickForwardViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYClickForwardViewController.h; sourceTree = "<group>"; };
+		37F0AED4208346FC000B5F0D /* FYClickForwardViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYClickForwardViewController.m; sourceTree = "<group>"; };
+		37F0AED62083A411000B5F0D /* FYClickCommentViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYClickCommentViewController.h; sourceTree = "<group>"; };
+		37F0AED72083A411000B5F0D /* FYClickCommentViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYClickCommentViewController.m; sourceTree = "<group>"; };
 		37F1D6512000FB8B00709D37 /* FYLoginRegisterController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FYLoginRegisterController.xib; sourceTree = "<group>"; };
 		37F1D6542000FB8B00709D37 /* FYLoginRegisterController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FYLoginRegisterController.m; sourceTree = "<group>"; };
 		37F1D6562000FB8B00709D37 /* FYLoginRegisterController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FYLoginRegisterController.h; sourceTree = "<group>"; };
 		37F1D65B2000FBFD00709D37 /* FYLoginRegisterView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FYLoginRegisterView.h; sourceTree = "<group>"; };
 		37F1D65C2000FBFD00709D37 /* FYLoginRegisterView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FYLoginRegisterView.m; sourceTree = "<group>"; };
 		37F1D65D2000FBFD00709D37 /* FYLoginRegisterView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FYLoginRegisterView.xib; sourceTree = "<group>"; };
+		37F2100320774E6C00E13DD4 /* FYDetailDrawboardColleCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYDetailDrawboardColleCell.h; sourceTree = "<group>"; };
+		37F2100420774E6C00E13DD4 /* FYDetailDrawboardColleCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYDetailDrawboardColleCell.m; sourceTree = "<group>"; };
+		37F2100520774E6C00E13DD4 /* FYDetailDrawboardColleCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FYDetailDrawboardColleCell.xib; sourceTree = "<group>"; };
+		37F21391207D0D7200271C90 /* FYSettingsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYSettingsViewController.h; sourceTree = "<group>"; };
+		37F21392207D0D7200271C90 /* FYSettingsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYSettingsViewController.m; sourceTree = "<group>"; };
+		37F2314520819DBA00BFDCD4 /* FYClickLikeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYClickLikeViewController.h; sourceTree = "<group>"; };
+		37F2314620819DBA00BFDCD4 /* FYClickLikeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYClickLikeViewController.m; sourceTree = "<group>"; };
+		37F2314B2082051E00BFDCD4 /* FYSelectDrawNameViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYSelectDrawNameViewController.h; sourceTree = "<group>"; };
+		37F2314C2082051E00BFDCD4 /* FYSelectDrawNameViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYSelectDrawNameViewController.m; sourceTree = "<group>"; };
 		37F28E5820142A75003B07BD /* FYDetailInfoController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYDetailInfoController.h; sourceTree = "<group>"; };
 		37F28E5920142A75003B07BD /* FYDetailInfoController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYDetailInfoController.m; sourceTree = "<group>"; };
-		37F3CB17200BAA4D00A2D1B3 /* Test.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Test.h; sourceTree = "<group>"; };
-		37F3CB18200BAA4D00A2D1B3 /* Test.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Test.m; sourceTree = "<group>"; };
-		37F3CB1A200BAA5800A2D1B3 /* Test.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Test.xib; sourceTree = "<group>"; };
-		37F3CB1C200BAC7100A2D1B3 /* FYPersonalCenterHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FYPersonalCenterHeader.xib; sourceTree = "<group>"; };
 		37F4DB7D202B5EC80034E23F /* FYDisplayCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FYDisplayCell.xib; sourceTree = "<group>"; };
 		37F65228201B838500B036C1 /* FYWorksUnitData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYWorksUnitData.h; sourceTree = "<group>"; };
 		37F65229201B838500B036C1 /* FYWorksUnitData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYWorksUnitData.m; sourceTree = "<group>"; };
@@ -122,6 +237,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37B4C3A1208E31BC0099EDD1 /* MobileCoreServices.framework in Frameworks */,
 				057E2BC048E57A7A601C6C09 /* libPods-FengYe.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -187,11 +303,11 @@
 		370D0B501FDD14B1004263E4 /* Message */ = {
 			isa = PBXGroup;
 			children = (
+				37AAEB51208AF2EE000D5E8D /* FYDetailPrivateViewController.h */,
+				37AAEB52208AF2EE000D5E8D /* FYDetailPrivateViewController.m */,
+				37F04DFC20878994009B6B24 /* View */,
 				370D0B481FDD145D004263E4 /* FYMessageViewController.h */,
 				370D0B491FDD145D004263E4 /* FYMessageViewController.m */,
-				37F3CB17200BAA4D00A2D1B3 /* Test.h */,
-				37F3CB18200BAA4D00A2D1B3 /* Test.m */,
-				37F3CB1A200BAA5800A2D1B3 /* Test.xib */,
 			);
 			path = Message;
 			sourceTree = "<group>";
@@ -199,9 +315,13 @@
 		370D0B511FDD14BB004263E4 /* PersonalCenter */ = {
 			isa = PBXGroup;
 			children = (
-				37F28E5720142702003B07BD /* MenuController */,
-				370D0B4B1FDD1485004263E4 /* FYPersonalCenterViewController.h */,
-				370D0B4C1FDD1485004263E4 /* FYPersonalCenterViewController.m */,
+				37B06DB7207E3C6E009B2AF5 /* Nav */,
+				37EDBEAD204AA7C400B9A984 /* FYPersonalCenterViewController.h */,
+				37EDBEAE204AA7C400B9A984 /* FYPersonalCenterViewController.m */,
+				37AF7C892073B9F600EB2B75 /* HeadSec */,
+				37B2FCD920640DD000E86A97 /* Model */,
+				37F097C62056D4FE004D34D8 /* Controller */,
+				37F097C52056D4F1004D34D8 /* View */,
 			);
 			path = PersonalCenter;
 			sourceTree = "<group>";
@@ -218,6 +338,7 @@
 		370D0B531FDD152E004263E4 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				37B4B445206A81B9006BB958 /* Category */,
 				37F08A942027321300429C90 /* Root */,
 				37F08A93202731F900429C90 /* View */,
 				37F08A92202731D200429C90 /* Controller */,
@@ -227,6 +348,15 @@
 				37FCF4B420023C2A00C955E9 /* CommonAttr.h */,
 			);
 			path = Common;
+			sourceTree = "<group>";
+		};
+		371FAFC4208F795F00B90453 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				371FAFC5208F798900B90453 /* uploadModel.h */,
+				371FAFC6208F798900B90453 /* uploadModel.m */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		3739CA9F1FE2CDB400CCA000 /* TestImage */ = {
@@ -252,13 +382,112 @@
 			path = TestImage;
 			sourceTree = "<group>";
 		};
+		37AF7C892073B9F600EB2B75 /* HeadSec */ = {
+			isa = PBXGroup;
+			children = (
+				37AF7C8A2073BC3A00EB2B75 /* Model */,
+				37AEED4E2072911700D64F1A /* FYShowAllFansViewController.h */,
+				37AEED4F2072911700D64F1A /* FYShowAllFansViewController.m */,
+			);
+			path = HeadSec;
+			sourceTree = "<group>";
+		};
+		37AF7C8A2073BC3A00EB2B75 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				37A2B712206EA641000E0C67 /* FYPersonalCenterHeaderData.h */,
+				37A2B713206EA641000E0C67 /* FYPersonalCenterHeaderData.m */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		37B06DB7207E3C6E009B2AF5 /* Nav */ = {
+			isa = PBXGroup;
+			children = (
+				37F21391207D0D7200271C90 /* FYSettingsViewController.h */,
+				37F21392207D0D7200271C90 /* FYSettingsViewController.m */,
+				37B06DB8207E3CA4009B2AF5 /* FYAbountViewController.h */,
+				37B06DB9207E3CA4009B2AF5 /* FYAbountViewController.m */,
+			);
+			path = Nav;
+			sourceTree = "<group>";
+		};
+		37B2FCD920640DD000E86A97 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				37B2FCDA20640E9F00E86A97 /* FYDrawboardCellUnitData.h */,
+				37B2FCDB20640E9F00E86A97 /* FYDrawboardCellUnitData.m */,
+				37B2FCDD2064132C00E86A97 /* FYUserCellData.h */,
+				37B2FCDE2064132C00E86A97 /* FYUserCellData.m */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		37B4B445206A81B9006BB958 /* Category */ = {
+			isa = PBXGroup;
+			children = (
+				37EF1C4F2075F1E3007D340E /* UIView+Frame.h */,
+				37EF1C502075F1E3007D340E /* UIView+Frame.m */,
+				37B4B44C206A8398006BB958 /* UITextView+Placeholder.h */,
+				37B4B44D206A8398006BB958 /* UITextView+Placeholder.m */,
+			);
+			path = Category;
+			sourceTree = "<group>";
+		};
+		37C154032066468700820E27 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				37C1540A2066473B00820E27 /* FYShowAllInterestCellViewController.h */,
+				37C1540B2066473B00820E27 /* FYShowAllInterestCellViewController.m */,
+				37C154072066470E00820E27 /* FYShowAllDrawboardCellViewController.h */,
+				37C154082066470E00820E27 /* FYShowAllDrawboardCellViewController.m */,
+				37C1540D2066475500820E27 /* FYShowAllAttentionUserCellViewController.h */,
+				37C1540E2066475500820E27 /* FYShowAllAttentionUserCellViewController.m */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		37EF3EDA2086553500E1983A /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				37EF3EDB2086557D00E1983A /* FYCommentData.h */,
+				37EF3EDC2086557D00E1983A /* FYCommentData.m */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		37F04DFB208788C1009B6B24 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				37EE18042084F88E0070BD04 /* FYCommentCell.h */,
+				37EE18052084F88E0070BD04 /* FYCommentCell.m */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		37F04DFC20878994009B6B24 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				37F04DFD20878AC7009B6B24 /* FYMessageDynanicCell.h */,
+				37F04DFE20878AC7009B6B24 /* FYMessageDynanicCell.m */,
+				37B70F622088EB7E00CF7397 /* FYMessagePrivateCell.h */,
+				37B70F632088EB7E00CF7397 /* FYMessagePrivateCell.m */,
+				3722CE12208B3C9900368F05 /* FYMessagePrivateDetailCell.h */,
+				3722CE13208B3C9900368F05 /* FYMessagePrivateDetailCell.m */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		37F08A92202731D200429C90 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				37F2314420819D7800BFDCD4 /* OperViewController */,
 				37F28E5820142A75003B07BD /* FYDetailInfoController.h */,
 				37F28E5920142A75003B07BD /* FYDetailInfoController.m */,
 				37F08A9B20275E1E00429C90 /* FYInterestGroupDetailController.h */,
 				37F08A9C20275E1E00429C90 /* FYInterestGroupDetailController.m */,
+				37F2314B2082051E00BFDCD4 /* FYSelectDrawNameViewController.h */,
+				37F2314C2082051E00BFDCD4 /* FYSelectDrawNameViewController.m */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -269,6 +498,12 @@
 				37F4DB7D202B5EC80034E23F /* FYDisplayCell.xib */,
 				37F7B9D51FE62F5C00756CA7 /* FYDisplayCell.h */,
 				37F7B9D61FE62F5C00756CA7 /* FYDisplayCell.m */,
+				37ED2080205514B700B664AD /* FYDrawboardCell.h */,
+				37ED2081205514B700B664AD /* FYDrawboardCell.m */,
+				37ED2082205514B700B664AD /* FYDrawboardCell.xib */,
+				37A72B5D206757DB009975E1 /* FYDrawboardCellAdd.h */,
+				37A72B5E206757DB009975E1 /* FYDrawboardCellAdd.m */,
+				37A72B5F206757DB009975E1 /* FYDrawboardCellAdd.xib */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -282,12 +517,86 @@
 			path = Root;
 			sourceTree = "<group>";
 		};
+		37F097C52056D4F1004D34D8 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				37EFD59120598A630031CD9B /* FYCollectionView.h */,
+				37EFD59220598A630031CD9B /* FYCollectionView.m */,
+				37F01696205C9D58007F39F8 /* FYModuleCell.h */,
+				37F01697205C9D58007F39F8 /* FYModuleCell.m */,
+				37F01698205C9D58007F39F8 /* FYModuleCell.xib */,
+				37F0169B205CA807007F39F8 /* FYInterestingCell.h */,
+				37F0169C205CA807007F39F8 /* FYInterestingCell.m */,
+				37F0169D205CA807007F39F8 /* FYInterestingCell.xib */,
+				378EC32C205CC5F1003578D3 /* FYUsersCell.h */,
+				378EC32D205CC5F1003578D3 /* FYUsersCell.m */,
+				378EC32E205CC5F1003578D3 /* FYUsersCell.xib */,
+				378EC331205CCEF8003578D3 /* FYScrollView.h */,
+				378EC332205CCEF8003578D3 /* FYScrollView.m */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		37F097C62056D4FE004D34D8 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				37F097CA2056D55B004D34D8 /* Drawboard */,
+				37F097CB2056D56C004D34D8 /* Collection */,
+				37F097CC2056D580004D34D8 /* Like */,
+				37F097CD2056D585004D34D8 /* Attention */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		37F097CA2056D55B004D34D8 /* Drawboard */ = {
+			isa = PBXGroup;
+			children = (
+				371FAFC4208F795F00B90453 /* Model */,
+				37F2100820774E7100E13DD4 /* View */,
+				37F097C72056D554004D34D8 /* FYDrawboardViewController.h */,
+				37F097C82056D554004D34D8 /* FYDrawboardViewController.m */,
+				37EEDD61206941B500926C56 /* FYNewDrawboardViewController.h */,
+				37EEDD62206941B500926C56 /* FYNewDrawboardViewController.m */,
+				37EF1C4C2075D2F5007D340E /* FYShowDetailDrawboardViewController.h */,
+				37EF1C4D2075D2F5007D340E /* FYShowDetailDrawboardViewController.m */,
+			);
+			path = Drawboard;
+			sourceTree = "<group>";
+		};
+		37F097CB2056D56C004D34D8 /* Collection */ = {
+			isa = PBXGroup;
+			children = (
+				37F097CE2056D5CB004D34D8 /* FYCollectionViewController.h */,
+				37F097CF2056D5CB004D34D8 /* FYCollectionViewController.m */,
+			);
+			path = Collection;
+			sourceTree = "<group>";
+		};
+		37F097CC2056D580004D34D8 /* Like */ = {
+			isa = PBXGroup;
+			children = (
+				37F097D12056D5EA004D34D8 /* FYLikeViewController.h */,
+				37F097D22056D5EA004D34D8 /* FYLikeViewController.m */,
+			);
+			path = Like;
+			sourceTree = "<group>";
+		};
+		37F097CD2056D585004D34D8 /* Attention */ = {
+			isa = PBXGroup;
+			children = (
+				37C154032066468700820E27 /* Controller */,
+				37F097D42056D607004D34D8 /* FYAttentionViewController.h */,
+				37F097D52056D607004D34D8 /* FYAttentionViewController.m */,
+			);
+			path = Attention;
+			sourceTree = "<group>";
+		};
 		37F1D6502000FB6300709D37 /* LoginRegister */ = {
 			isa = PBXGroup;
 			children = (
+				37F1D65D2000FBFD00709D37 /* FYLoginRegisterView.xib */,
 				37F1D65B2000FBFD00709D37 /* FYLoginRegisterView.h */,
 				37F1D65C2000FBFD00709D37 /* FYLoginRegisterView.m */,
-				37F1D65D2000FBFD00709D37 /* FYLoginRegisterView.xib */,
 				37F1D6562000FB8B00709D37 /* FYLoginRegisterController.h */,
 				37F1D6542000FB8B00709D37 /* FYLoginRegisterController.m */,
 				37F1D6512000FB8B00709D37 /* FYLoginRegisterController.xib */,
@@ -295,23 +604,38 @@
 			path = LoginRegister;
 			sourceTree = "<group>";
 		};
+		37F2100820774E7100E13DD4 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				37F2100320774E6C00E13DD4 /* FYDetailDrawboardColleCell.h */,
+				37F2100420774E6C00E13DD4 /* FYDetailDrawboardColleCell.m */,
+				37F2100520774E6C00E13DD4 /* FYDetailDrawboardColleCell.xib */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		37F2314420819D7800BFDCD4 /* OperViewController */ = {
+			isa = PBXGroup;
+			children = (
+				37F04DFB208788C1009B6B24 /* View */,
+				37EF3EDA2086553500E1983A /* Model */,
+				37F2314520819DBA00BFDCD4 /* FYClickLikeViewController.h */,
+				37F2314620819DBA00BFDCD4 /* FYClickLikeViewController.m */,
+				37F0AED3208346FC000B5F0D /* FYClickForwardViewController.h */,
+				37F0AED4208346FC000B5F0D /* FYClickForwardViewController.m */,
+				37F0AED62083A411000B5F0D /* FYClickCommentViewController.h */,
+				37F0AED72083A411000B5F0D /* FYClickCommentViewController.m */,
+			);
+			path = OperViewController;
+			sourceTree = "<group>";
+		};
 		37F28E56201426BA003B07BD /* CustomLayout */ = {
 			isa = PBXGroup;
 			children = (
-				37FDCEF81FDED6E90031BFC2 /* FYCollectionViewWaterFallLayout.m */,
 				37FDCEF71FDED6E90031BFC2 /* FYCollectionViewWaterFallLayout.h */,
+				37FDCEF81FDED6E90031BFC2 /* FYCollectionViewWaterFallLayout.m */,
 			);
 			path = CustomLayout;
-			sourceTree = "<group>";
-		};
-		37F28E5720142702003B07BD /* MenuController */ = {
-			isa = PBXGroup;
-			children = (
-				379B054F200F8C7E00A690C1 /* FYPersonalCenterHeader.m */,
-				379B054E200F8C7E00A690C1 /* FYPersonalCenterHeader.h */,
-				37F3CB1C200BAC7100A2D1B3 /* FYPersonalCenterHeader.xib */,
-			);
-			path = MenuController;
 			sourceTree = "<group>";
 		};
 		37F65227201B835500B036C1 /* Model */ = {
@@ -321,6 +645,8 @@
 				37F65229201B838500B036C1 /* FYWorksUnitData.m */,
 				37F08A95202732E400429C90 /* FYInterestGroupUnitData.h */,
 				37F08A96202732E400429C90 /* FYInterestGroupUnitData.m */,
+				37F099F62045B00A00C8028C /* FYInterestGroupDetailData.h */,
+				37F099F72045B00A00C8028C /* FYInterestGroupDetailData.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -328,6 +654,7 @@
 		4A7E71903881BE8D506F3BCD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				37B4C3A0208E31AC0099EDD1 /* MobileCoreServices.framework */,
 				DC52981DBA3D771F5837D53B /* libPods-FengYe.a */,
 			);
 			name = Frameworks;
@@ -404,15 +731,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				3739CAD51FE2CE9000CCA000 /* 1.bmp in Resources */,
-				37F3CB1B200BAA5800A2D1B3 /* Test.xib in Resources */,
+				378EC330205CC5F1003578D3 /* FYUsersCell.xib in Resources */,
+				37F2100720774E6C00E13DD4 /* FYDetailDrawboardColleCell.xib in Resources */,
 				3739CAD41FE2CE9000CCA000 /* 2.bmp in Resources */,
 				3739CAD31FE2CE9000CCA000 /* 4.bmp in Resources */,
+				37F0169F205CA807007F39F8 /* FYInterestingCell.xib in Resources */,
 				3739CACD1FE2CE9000CCA000 /* 15.bmp in Resources */,
 				3739CADA1FE2CE9000CCA000 /* 12.bmp in Resources */,
 				3739CAD01FE2CE9000CCA000 /* 7.bmp in Resources */,
 				3739CACE1FE2CE9000CCA000 /* 14.bmp in Resources */,
-				37F3CB1D200BAC7100A2D1B3 /* FYPersonalCenterHeader.xib in Resources */,
 				37F1D6572000FB8B00709D37 /* FYLoginRegisterController.xib in Resources */,
+				37ED2084205514B700B664AD /* FYDrawboardCell.xib in Resources */,
 				3739CAD91FE2CE9000CCA000 /* 9.bmp in Resources */,
 				3739CAD81FE2CE9000CCA000 /* 13.bmp in Resources */,
 				3739CADB1FE2CE9000CCA000 /* 11.bmp in Resources */,
@@ -423,9 +752,11 @@
 				37F7B9D41FE6115E00756CA7 /* 0.bmp in Resources */,
 				370D0B391FDCF0B4004263E4 /* Assets.xcassets in Resources */,
 				370D0B371FDCF0B4004263E4 /* Main.storyboard in Resources */,
+				37A72B61206757DB009975E1 /* FYDrawboardCellAdd.xib in Resources */,
 				3739CAD71FE2CE9000CCA000 /* 6.bmp in Resources */,
 				3739CAD61FE2CE9000CCA000 /* 8.bmp in Resources */,
 				3739CAD21FE2CE9000CCA000 /* 5.bmp in Resources */,
+				37F0169A205C9D58007F39F8 /* FYModuleCell.xib in Resources */,
 				37F4DB7E202B5EC80034E23F /* FYDisplayCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -488,23 +819,58 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				37F3CB19200BAA4D00A2D1B3 /* Test.m in Sources */,
+				37B2FCDC20640E9F00E86A97 /* FYDrawboardCellUnitData.m in Sources */,
+				37F0AED82083A411000B5F0D /* FYClickCommentViewController.m in Sources */,
 				37F7B9D81FE62F5C00756CA7 /* FYDisplayCell.m in Sources */,
+				37C1540C2066473B00820E27 /* FYShowAllInterestCellViewController.m in Sources */,
 				370D0B471FDD0712004263E4 /* FYTabBarController.m in Sources */,
+				37F21393207D0D7200271C90 /* FYSettingsViewController.m in Sources */,
+				3722CE14208B3C9900368F05 /* FYMessagePrivateDetailCell.m in Sources */,
+				37F097C92056D554004D34D8 /* FYDrawboardViewController.m in Sources */,
+				37F04DFF20878AC7009B6B24 /* FYMessageDynanicCell.m in Sources */,
+				37F0AED5208346FC000B5F0D /* FYClickForwardViewController.m in Sources */,
+				37B4B44E206A8398006BB958 /* UITextView+Placeholder.m in Sources */,
+				37F01699205C9D58007F39F8 /* FYModuleCell.m in Sources */,
 				37F6522A201B838500B036C1 /* FYWorksUnitData.m in Sources */,
+				37AEED502072911700D64F1A /* FYShowAllFansViewController.m in Sources */,
+				37B06DBA207E3CA4009B2AF5 /* FYAbountViewController.m in Sources */,
 				370D0B341FDCF0B4004263E4 /* FYDiscoverViewController.m in Sources */,
-				379B0550200F8C7E00A690C1 /* FYPersonalCenterHeader.m in Sources */,
+				37EF1C512075F1E3007D340E /* UIView+Frame.m in Sources */,
+				378EC32F205CC5F1003578D3 /* FYUsersCell.m in Sources */,
+				37F099F82045B00A00C8028C /* FYInterestGroupDetailData.m in Sources */,
+				37F2100620774E6C00E13DD4 /* FYDetailDrawboardColleCell.m in Sources */,
+				37F097D02056D5CB004D34D8 /* FYCollectionViewController.m in Sources */,
+				37C154092066470E00820E27 /* FYShowAllDrawboardCellViewController.m in Sources */,
+				37EE18062084F88E0070BD04 /* FYCommentCell.m in Sources */,
+				37EDBEAF204AA7C400B9A984 /* FYPersonalCenterViewController.m in Sources */,
+				37EF1C4E2075D2F5007D340E /* FYShowDetailDrawboardViewController.m in Sources */,
+				37A72B60206757DB009975E1 /* FYDrawboardCellAdd.m in Sources */,
+				37F0169E205CA807007F39F8 /* FYInterestingCell.m in Sources */,
+				37EFD59320598A630031CD9B /* FYCollectionView.m in Sources */,
 				370D0B2E1FDCF0B4004263E4 /* AppDelegate.m in Sources */,
+				37EEDD63206941B500926C56 /* FYNewDrawboardViewController.m in Sources */,
+				371FAFC7208F798900B90453 /* uploadModel.m in Sources */,
+				37A2B714206EA641000E0C67 /* FYPersonalCenterHeaderData.m in Sources */,
+				37AAEB53208AF2EE000D5E8D /* FYDetailPrivateViewController.m in Sources */,
 				37F1D6592000FB8B00709D37 /* FYLoginRegisterController.m in Sources */,
+				37F2314D2082051E00BFDCD4 /* FYSelectDrawNameViewController.m in Sources */,
+				37B2FCDF2064132C00E86A97 /* FYUserCellData.m in Sources */,
+				37EF3EDD2086557D00E1983A /* FYCommentData.m in Sources */,
+				37ED2083205514B700B664AD /* FYDrawboardCell.m in Sources */,
+				37B70F642088EB7E00CF7397 /* FYMessagePrivateCell.m in Sources */,
 				37F08A97202732E400429C90 /* FYInterestGroupUnitData.m in Sources */,
+				378EC333205CCEF8003578D3 /* FYScrollView.m in Sources */,
 				37F08A9D20275E1E00429C90 /* FYInterestGroupDetailController.m in Sources */,
+				37F097D62056D607004D34D8 /* FYAttentionViewController.m in Sources */,
 				370D0B3F1FDCF0B4004263E4 /* main.m in Sources */,
 				37F1D65E2000FBFD00709D37 /* FYLoginRegisterView.m in Sources */,
+				37F2314720819DBA00BFDCD4 /* FYClickLikeViewController.m in Sources */,
+				37C1540F2066475500820E27 /* FYShowAllAttentionUserCellViewController.m in Sources */,
 				370D0B311FDCF0B4004263E4 /* FYRecommendViewController.m in Sources */,
 				370D0B4A1FDD145D004263E4 /* FYMessageViewController.m in Sources */,
 				37F28E5A20142A75003B07BD /* FYDetailInfoController.m in Sources */,
+				37F097D32056D5EA004D34D8 /* FYLikeViewController.m in Sources */,
 				37FDCEF91FDED6E90031BFC2 /* FYCollectionViewWaterFallLayout.m in Sources */,
-				370D0B4D1FDD1485004263E4 /* FYPersonalCenterViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

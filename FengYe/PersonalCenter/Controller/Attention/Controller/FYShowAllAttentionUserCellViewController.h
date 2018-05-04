@@ -7,7 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "FYUserCellData.h"
 
 @interface FYShowAllAttentionUserCellViewController : UIViewController
 
+@property(nonatomic, retain) NSMutableArray<FYUserCellData*>* allAttentionUsersCellAttr;
+@property(nonatomic, assign) CGFloat userCellOrigWidth;
+@property(nonatomic, assign) CGFloat userCellOrigHeight;
 @end

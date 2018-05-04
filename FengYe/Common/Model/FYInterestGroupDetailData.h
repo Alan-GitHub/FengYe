@@ -9,5 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @interface FYInterestGroupDetailData : NSObject
-
+//regard
+@property(nonatomic, assign) NSInteger numsOfRegardUser;
+@property(nonatomic, strong) NSMutableArray* headIconOfRegardUser;
 @end

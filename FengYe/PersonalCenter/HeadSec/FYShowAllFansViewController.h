@@ -10,4 +10,5 @@
 
 @interface FYShowAllFansViewController : UIViewController
 
+@property (nonatomic, copy) NSString* userName;
 @end

@@ -7,7 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "FYInterestGroupUnitData.h"
 
 @interface FYInterestGroupDetailController : UIViewController
-@property(nonatomic, assign) NSInteger index;
+
+@property(nonatomic, retain) FYInterestGroupUnitData* interestGroupUnitData;
 @end

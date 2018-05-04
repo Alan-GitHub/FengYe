@@ -13,6 +13,10 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     // Initialization code
+    
+    //设置cell的边框颜色
+    self.layer.borderColor = [UIColor blackColor].CGColor;
+    self.layer.borderWidth = 1;
 }
 
 @end
