@@ -17,6 +17,8 @@
 #import <UIImageView+WebCache.h>
 #import "FYDetailInfoController.h"
 #import "FYInterestGroupDetailData.h"
+#import <SVProgressHUD.h>
+#import "FYLoginRegisterController.h"
 
 #define CollectionViewCellID @"InrstGpDetailCollectionViewCellID"
 
@@ -37,6 +39,8 @@
 @property(nonatomic, strong) NSMutableArray<FYWorksUnitData*>* worksUnitArrInrstGpDetail;
 @property(nonatomic, strong) NSMutableArray<FYInterestGroupUnitData*>* interestGroupUnitArrInrstGpDetail;
 @property(nonatomic, strong) FYInterestGroupDetailData* inrstGroupDetailData;
+
+@property(nonatomic, retain) UIButton* gRegardBtn;
 @end
 
 @implementation FYInterestGroupDetailController
@@ -46,6 +50,9 @@
     // Do any additional setup after loading the view.
 //    NSLog(@"xxx=%zd", self.index);
     self.navigationItem.title = self.interestGroupUnitData.interestGroupName;
+    
+    //增加右侧导航按钮
+    [self addNavRightButton];
     
     CGFloat offsetY = 0;
     
@@ -70,6 +77,103 @@
     [self loadData];
 }
 
+- (void) addNavRightButton{
+    
+    UIButton *btn = [UIButton buttonWithType: UIButtonTypeCustom];
+    [btn setTitle:@"+关注" forState:UIControlStateNormal];
+    [btn setTitle:@"✔️" forState:UIControlStateSelected];
+    [btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    btn.backgroundColor = [UIColor redColor];
+    btn.titleLabel.font = [UIFont systemFontOfSize:17];
+    [btn sizeToFit];
+    [btn addTarget:self action:@selector(regardButtonClicked:) forControlEvents: UIControlEventTouchUpInside];
+    self.gRegardBtn = btn;
+    
+    UIBarButtonItem  *barbtn = [[UIBarButtonItem alloc] initWithCustomView: btn];
+    self.navigationItem.rightBarButtonItem = barbtn;
+}
+
+- (void) regardButtonClicked:(UIButton*) btn{
+    
+    //检查是否已登录
+    NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+    Boolean isLogin = [[userDef objectForKey:@"isLogin"] boolValue];
+    if (!isLogin) { //未登录
+        
+        //弹出登录框
+        FYLoginRegisterController* login = [[FYLoginRegisterController alloc] init];
+        [self presentViewController:login animated:YES completion:nil];
+        
+        return;
+    }
+    
+    //已登录。继续往下走
+    btn.selected = !btn.selected;
+    if (btn.selected) {
+        btn.backgroundColor = [UIColor lightGrayColor];
+    }else{
+        btn.backgroundColor = [UIColor redColor];
+    }
+    
+    //更新数据库
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionary];
+    
+    parameters[@"ver"] = @"1";
+    parameters[@"service"] = @"INTEREST_GROUP_REGARD_OR_NOT";
+    parameters[@"biz"] = @"111";
+    parameters[@"time"] = @"20180126225600";
+    
+    NSMutableDictionary* paramData = [NSMutableDictionary dictionary];
+    
+    //当前登录用户
+    paramData[@"loginUser"] = [userDef objectForKey:@"loginName"];
+    
+    //兴趣组名
+    paramData[@"groupName"] = self.interestGroupUnitData.interestGroupName;
+    
+    //关注还是取消关注
+    paramData[@"regardOrNot"] = [NSString stringWithFormat:@"%zd", btn.selected];
+    
+    parameters[@"data"] = paramData;
+    
+    NSString* url = ServerURL;
+    NSError* error;
+    NSData* jsonData = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:&error];
+    NSString* jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    
+    AFURLSessionManager* manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+    
+    NSMutableURLRequest* req = [[AFJSONRequestSerializer serializer] requestWithMethod:@"POST" URLString:url parameters:nil error:nil];
+    
+    req.timeoutInterval = [[[NSUserDefaults standardUserDefaults] valueForKey:@"timeoutInterval"] longValue];
+    
+    [req setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [req setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+    [req setHTTPBody:[jsonString dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    [[manager dataTaskWithRequest:req completionHandler:^(NSURLResponse * _Nonnull response, NSDictionary*  _Nullable responseObject, NSError * _Nullable error) {
+        if(!error){
+            //NSLog(@"Reply JSON: %@", responseObject);
+            NSInteger retValue = [responseObject[@"retCode"] integerValue];
+            if (retValue == 0) {
+                [SVProgressHUD showErrorWithStatus:@"处理错误"];
+            }
+        } else{
+            NSLog(@"Error: %@, %@, %@", error, response, responseObject);
+            [SVProgressHUD showErrorWithStatus:@"网络故障"];
+        }
+    }] resume];
+}
+
+- (void) regardButtonStatus:(bool) isChoice{
+    
+    self.gRegardBtn.selected = isChoice;
+    if (self.gRegardBtn.selected) {
+        self.gRegardBtn.backgroundColor = [UIColor lightGrayColor];
+    }else{
+        self.gRegardBtn.backgroundColor = [UIColor redColor];
+    }
+}
 
 - (UIView*) getInterestGroupInfo{
     
@@ -193,14 +297,16 @@
     NSMutableDictionary* paramData = [NSMutableDictionary dictionary];
     paramData[@"clickedInrstGroupName"] = self.interestGroupUnitData.interestGroupName;
 
+    //登录用户
+    NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+    paramData[@"loginUser"] = [userDef objectForKey:@"loginName"];
+    
     parameters[@"data"] = paramData;
     
     NSString* url = ServerURL;
     NSError* error;
     NSData* jsonData = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:&error];
     NSString* jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    
-    //    NSLog(@"jsonString=%@", jsonString);
     
     AFURLSessionManager* manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
     
@@ -218,11 +324,11 @@
         if(!error){
             //NSLog(@"Reply JSON: %@", responseObject);
             self.inrstGroupDetailData = [FYInterestGroupDetailData mj_objectWithKeyValues:responseObject[@"groupDetail"]];
-            NSLog(@"self.inrstGroupDetailData=%zd", self.inrstGroupDetailData.numsOfRegardUser);
-            
             [self.worksUnitArrInrstGpDetail addObjectsFromArray:[FYWorksUnitData mj_objectArrayWithKeyValuesArray:responseObject[@"worksUnitData"]]];
-            
             [self.interestGroupUnitArrInrstGpDetail addObjectsFromArray:[FYInterestGroupUnitData mj_objectArrayWithKeyValuesArray:responseObject[@"interestGroupUnitData"]]];
+            
+            //正确设置关注按钮的状态
+            [self regardButtonStatus:self.inrstGroupDetailData.isAttention];
             
             [self specifyInrstGroupLoadData];
             [self inrstGroupLoadData];
@@ -335,8 +441,9 @@
         
         UILabel* groupName = [[UILabel alloc] initWithFrame:CGRectMake(0, InterestGroupSize*2/3, InterestGroupSize, InterestGroupSize/3)];
         groupName.text = inrstGroupUnitData.interestGroupName;
+        groupName.textColor = [UIColor whiteColor];
         groupName.textAlignment = NSTextAlignmentCenter;
-        groupName.backgroundColor = [UIColor colorWithRed:255 green:255 blue:255 alpha:0.5];
+        groupName.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
         [inrstGroup addSubview:groupName];
         
         inrstGroup.tag = i;

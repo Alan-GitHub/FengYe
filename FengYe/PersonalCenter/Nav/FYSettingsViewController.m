@@ -64,7 +64,7 @@
             
         case 1:
             if (0 == row) {
-                cell.textLabel.text = @"退出登录";
+                cell.textLabel.text = @"注销";
             }
             break;
             
@@ -102,7 +102,7 @@
 - (void) logout{
 
     //初始化对话框
-    UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"退出登录" message:@"确认要退出吗？" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController* alert = [UIAlertController alertControllerWithTitle:nil message:@"确认要退出登录吗？" preferredStyle:UIAlertControllerStyleAlert];
     
     //添加确定按钮
     [alert addAction:[UIAlertAction actionWithTitle:@"退出" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {

@@ -63,7 +63,9 @@
     NSInteger index = [indexPath item];
     
     inrstCell.interestGroupName.text = self.allInterestCellAttr[index].interestGroupName;
-    [inrstCell.coverImage sd_setImageWithURL:[NSURL URLWithString:self.allInterestCellAttr[index].coverImageURL]];
+    
+    NSString* coverImageURL = [self.allInterestCellAttr[index].coverImageURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [inrstCell.coverImage sd_setImageWithURL:[NSURL URLWithString:coverImageURL]];
     inrstCell.coverImage.contentMode = UIViewContentModeScaleAspectFill;
     
     return inrstCell;

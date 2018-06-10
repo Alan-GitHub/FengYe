@@ -17,4 +17,6 @@
 @property(nonatomic, assign) NSInteger fansNum;
 @property(nonatomic, copy) NSString* headIconURL;
 @property(nonatomic, copy) NSString* username;
+
+@property(nonatomic, assign) bool isAttention;
 @end

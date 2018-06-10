@@ -89,10 +89,9 @@
     
     [[manager dataTaskWithRequest:req completionHandler:^(NSURLResponse * _Nonnull response, NSDictionary*  _Nullable responseObject, NSError * _Nullable error) {
         if(!error){
-//            NSLog(@"Reply JSON: %@", responseObject);
+            //NSLog(@"Reply JSON: %@", responseObject);
             [self.dataAttr addObjectsFromArray:[FYDrawboardCellUnitData mj_objectArrayWithKeyValuesArray:responseObject[@"selfDrawboardCell"]]];
             [self.gDboardColleView reloadData];
-            
             
         } else{
             NSLog(@"Error: %@, %@, %@", error, response, responseObject);
@@ -111,8 +110,17 @@
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
+
+    NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+    NSString* loginName = [userDef objectForKey:@"loginName"];
     
-    return self.dataAttr.count + 1;
+    if (self.userName.length && ![self.userName isEqualToString:loginName]) { //进入的是别人的个人中心
+        
+        return self.dataAttr.count;
+    }else{ //进入了自己的个人中心界面
+        
+        return self.dataAttr.count + 1;
+    }
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
@@ -120,13 +128,22 @@
     NSInteger index = [indexPath item];
     
     if (index == self.dataAttr.count) {
-        FYDrawboardCellAdd* addCell = [collectionView dequeueReusableCellWithReuseIdentifier:DrawboardCellAdd forIndexPath:indexPath];
-        return addCell;
+        
+        NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+        NSString* loginName = [userDef objectForKey:@"loginName"];
+        if (self.userName.length && ![self.userName isEqualToString:loginName]) { //进入的是别人的个人中心
+            //不需要做任何事。  不用显示添加cell
+        }else{ //进入了自己的个人中心界面
+        
+            FYDrawboardCellAdd* addCell = [collectionView dequeueReusableCellWithReuseIdentifier:DrawboardCellAdd forIndexPath:indexPath];
+            return addCell;
+        }
     }
     
     FYDrawboardCell* tempCell = [collectionView dequeueReusableCellWithReuseIdentifier:FirstCollectionViewCellID forIndexPath:indexPath];
 
-    [tempCell.moduleCover sd_setImageWithURL:[NSURL URLWithString:self.dataAttr[index].coverImageURL]];
+    NSString* moduleCoverURL = [self.dataAttr[index].coverImageURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [tempCell.moduleCover sd_setImageWithURL:[NSURL URLWithString:moduleCoverURL]];
     tempCell.moduleCover.contentMode = UIViewContentModeScaleAspectFill;
     tempCell.moduleName.text = self.dataAttr[index].drawboardName;
     tempCell.worksNumsInModule.text = [NSString stringWithFormat:@"%ld", self.dataAttr[index].picNums];
@@ -149,6 +166,7 @@
         UINavigationController* nav = [[UINavigationController alloc] initWithRootViewController:newDboardVC];
         [self presentViewController:nav animated:YES completion:nil];
     } else{
+      
         //显示详细画板
         FYShowDetailDrawboardViewController* detailDrawboard = [[FYShowDetailDrawboardViewController alloc] init];
         detailDrawboard.specifyDrawData = self.dataAttr[index];

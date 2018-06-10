@@ -62,7 +62,8 @@
     FYUsersCell* userCell = [collectionView dequeueReusableCellWithReuseIdentifier:UserCell forIndexPath:indexPath];
     NSInteger index = [indexPath item];
     
-    [userCell.userHeadIcon sd_setImageWithURL:[NSURL URLWithString:self.allAttentionUsersCellAttr[index].userHeadIcon]];
+    NSString* userHeadIconURL = [self.allAttentionUsersCellAttr[index].userHeadIcon stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [userCell.userHeadIcon sd_setImageWithURL:[NSURL URLWithString:userHeadIconURL]];
     userCell.userHeadIcon.layer.cornerRadius = (ItemWidth - 60) / 2;
     userCell.userHeadIcon.layer.masksToBounds = YES;
     userCell.userName.text = self.allAttentionUsersCellAttr[index].userName;

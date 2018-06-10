@@ -62,7 +62,7 @@
     self.collectionView.contentInset = UIEdgeInsetsMake(offsetY, 0, 0, 0);
     
     self.waterFallLayout.data = self.worksUnitArrDisc;
-    
+ 
     [self loadData];
 }
 
@@ -84,8 +84,6 @@
     NSError* error;
     NSData* jsonData = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:&error];
     NSString* jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    
-    //    NSLog(@"jsonString=%@", jsonString);
     
     AFURLSessionManager* manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
     
@@ -127,7 +125,7 @@
         
         UIView* inrstGroup = [[UIView alloc] init];
         inrstGroup.frame = CGRectMake(MarginLeft + (InterestGroupSize+MarginIn) * i, MarginTop, InterestGroupSize, InterestGroupSize);
-        inrstGroup.backgroundColor = [self randomColor];
+        inrstGroup.backgroundColor = [UIColor clearColor];
         inrstGroup.layer.cornerRadius = 15;
         inrstGroup.clipsToBounds = YES;
         [self.inrstGroupView addSubview:inrstGroup];
@@ -143,8 +141,9 @@
         
         UILabel* groupName = [[UILabel alloc] initWithFrame:CGRectMake(0, InterestGroupSize*2/3, InterestGroupSize, InterestGroupSize/3)];
         groupName.text = inrstGroupUnitData.interestGroupName;
+        groupName.textColor = [UIColor whiteColor];
         groupName.textAlignment = NSTextAlignmentCenter;
-        groupName.backgroundColor = [UIColor colorWithRed:255 green:255 blue:255 alpha:0.5];
+        groupName.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
         [inrstGroup addSubview:groupName];
         
         inrstGroup.tag = i;
@@ -246,7 +245,8 @@
     
     FYWorksUnitData* data = self.worksUnitArrDisc[indexPath.item];
     
-    [cell.workImage sd_setImageWithURL:[NSURL URLWithString:data.picURL] completed:nil];
+    NSString* workURL = [data.picURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [cell.workImage sd_setImageWithURL:[NSURL URLWithString:workURL] completed:nil];
     
     //转采数量
     NSString* zhuanCaiTxt = data.forwardCount > 0 ? [NSString stringWithFormat:@"%zd", data.forwardCount] : @"";
@@ -261,7 +261,8 @@
     cell.commentLabel.text = commentTxt;
 
     cell.descriptionLabel.text = data.descriptionText;
-    [cell.headerIcon sd_setImageWithURL:[NSURL URLWithString:data.headIcon] completed:nil];
+    NSString* headiconURL = [data.headIcon stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [cell.headerIcon sd_setImageWithURL:[NSURL URLWithString:headiconURL] completed:nil];
     cell.usernameLabel.text = data.owner;
     cell.workModuleLabel.text = data.templateName;
     

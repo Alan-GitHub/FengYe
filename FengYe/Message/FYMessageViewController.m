@@ -31,7 +31,9 @@
 @property(nonatomic, retain) UIView* gBgView;
 @property(nonatomic, retain) UIView* gUnderline;
 
+//动态
 @property(nonatomic, retain) UITableView* gTable1;
+//私信
 @property(nonatomic, retain) UITableView* gTable2;
 
 @property(nonatomic, retain) NSMutableArray<FYCommentData*>* msgDynAttr;
@@ -54,6 +56,25 @@
     [self setupAllChildVCs];
 
     [self loadMessageDynamicData];
+}
+
+- (void)viewWillAppear:(BOOL)animated{
+    
+    //从上个控制器返回时，取消动态cell的选中状态
+    [self.gTable1 deselectRowAtIndexPath:[self.gTable1 indexPathForSelectedRow] animated:YES];
+    
+    //从上个控制器返回时，取消私信cell的选中状态
+    [self.gTable2 deselectRowAtIndexPath:[self.gTable2 indexPathForSelectedRow] animated:YES];
+    
+    //标题按钮的下划线位置
+    CGRect rect = self.gUnderline.frame;
+    if (self.gScrollViewBack.contentOffset.x == 0) {
+        rect.origin.x = self.gBtnLeft.frame.origin.x;
+        self.gUnderline.frame = rect;
+    } else { //1
+        rect.origin.x = self.gBtnRight.frame.origin.x;
+        self.gUnderline.frame = rect;
+    }
 }
 
 - (void) loadMessageDynamicData{
@@ -189,6 +210,8 @@
 
 - (void) setupUnderline{
     
+    NSLog(@"setupUnderline");
+    
     UIView* underline = [[UIView alloc] init];
     underline.backgroundColor = [UIColor blackColor];
     
@@ -269,7 +292,6 @@
         if (0 == arg) {
             
             self.gScrollViewBack.contentOffset = CGPointMake(0, self.gScrollViewBack.contentOffset.y);
-            NSLog(@"111111");
         } else { //1
             
             self.gScrollViewBack.contentOffset = CGPointMake(ScreenWidth, self.gScrollViewBack.contentOffset.y);
@@ -322,7 +344,7 @@
     
     NSInteger index = [indexPath row];
     UITableViewCell* cell;
-    if (tableView.tag == 1) {
+    if (tableView.tag == 1) { //动态
         
         FYMessageDynanicCell* msgDynCell = [tableView dequeueReusableCellWithIdentifier:MessageDynamicID];
         if (nil == msgDynCell) {
@@ -331,7 +353,8 @@
         }
         
         //评论用户的头像
-        [msgDynCell.commentUserHeadIcon sd_setImageWithURL:[NSURL URLWithString:self.msgDynAttr[index].commentUserHeadIconUrl] completed:nil];
+        NSString* commentUserHeadIconURL = [self.msgDynAttr[index].commentUserHeadIconUrl stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+        [msgDynCell.commentUserHeadIcon sd_setImageWithURL:[NSURL URLWithString:commentUserHeadIconURL] completed:nil];
         msgDynCell.commentUserHeadIcon.layer.cornerRadius = CommentUserHeadIconHeight/2;
         msgDynCell.commentUserHeadIcon.layer.masksToBounds = YES;
         
@@ -341,17 +364,21 @@
         msgDynCell.commentUsername.font = [UIFont systemFontOfSize:12];
         
         //评论时间
-        msgDynCell.commentTime.text = self.msgDynAttr[index].commentTime;
+        NSInteger timeValue = [self.msgDynAttr[index].commentTime integerValue];
+        msgDynCell.commentTime.text =  [self timeFormatLocal:timeValue];
         msgDynCell.commentTime.font = [UIFont systemFontOfSize:10];
         msgDynCell.commentTime.textColor = [UIColor lightGrayColor];
         
         //我的头像
-        [msgDynCell.myHeadIcon sd_setImageWithURL:[NSURL URLWithString:self.msgDynAttr[index].myHeadIconUrl] completed:nil];
+        NSString* myHeadIconURL = [self.msgDynAttr[index].myHeadIconUrl stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+        [msgDynCell.myHeadIcon sd_setImageWithURL:[NSURL URLWithString:myHeadIconURL] completed:nil];
         msgDynCell.myHeadIcon.layer.cornerRadius = CommentUserHeadIconHeight/2;
         msgDynCell.myHeadIcon.layer.masksToBounds = YES;
         
+        //msgDynCell.selectionStyle = UITableViewCellSelectionStyleNone;
+        
         cell = msgDynCell;
-    } else if(tableView.tag == 2){
+    } else if(tableView.tag == 2){ //私信
         
         FYMessagePrivateCell* msgPrivCell = [tableView dequeueReusableCellWithIdentifier:MessagePrivateID];
         if (nil == msgPrivCell) {
@@ -360,7 +387,8 @@
         }
         
         //私信用户的头像
-        [msgPrivCell.privMsgUserHeadIcon sd_setImageWithURL:[NSURL URLWithString:self.msgPrivAttr[index].commentUserHeadIconUrl] completed:nil];
+        NSString* privMsgUserHeadIconURL = [self.msgPrivAttr[index].commentUserHeadIconUrl stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+        [msgPrivCell.privMsgUserHeadIcon sd_setImageWithURL:[NSURL URLWithString:privMsgUserHeadIconURL] completed:nil];
         msgPrivCell.privMsgUserHeadIcon.layer.cornerRadius = CommentUserHeadIconHeight/2;
         msgPrivCell.privMsgUserHeadIcon.layer.masksToBounds = YES;
         
@@ -373,7 +401,8 @@
         msgPrivCell.privMsgContent.font = [UIFont systemFontOfSize:12];
         
         //私信时间
-        msgPrivCell.privMsgTime.text = self.msgPrivAttr[index].commentTime;
+        NSInteger timeValue = [self.msgPrivAttr[index].commentTime integerValue];
+        msgPrivCell.privMsgTime.text = [self timeFormatLocal:timeValue];
         msgPrivCell.privMsgTime.font = [UIFont systemFontOfSize:10];
         
         cell = msgPrivCell;
@@ -389,12 +418,13 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    if (tableView.tag == 1) {
+    if (tableView.tag == 1) { //动态
         
         FYPersonalCenterViewController* pcVC = [[FYPersonalCenterViewController alloc] init];
         pcVC.userName = self.msgDynAttr[indexPath.row].commentUsername;
         [self.navigationController pushViewController:pcVC animated:YES];
-    } else if(tableView.tag == 2){
+        
+    } else if(tableView.tag == 2){ //私信
         
         FYDetailPrivateViewController* detailPrivateVC = [[FYDetailPrivateViewController alloc] init];
         detailPrivateVC.privMsgUsername = self.msgPrivAttr[indexPath.row].commentUsername;
@@ -408,6 +438,41 @@
     int arg = self.gScrollViewBack.contentOffset.x == 0? 0 : 1;
     [self changeUnderline:arg];
 }
+
+- (NSString*) timeFormatLocal:(NSInteger) timeInMillis{
+    
+    //获取当前时间
+    NSTimeInterval nowTime = [[NSDate date] timeIntervalSince1970] * 1000;
+    long long nowTimeInMillis = [[NSNumber numberWithDouble:nowTime] longLongValue];
+    
+    //当前时间与作品上传时间的差值
+    long long howLong = nowTimeInMillis - timeInMillis;
+    
+    NSString* timeStr = nil;
+    
+    if (howLong / 1000 > 0 && howLong / 1000 < 60) {  //单位秒
+        
+        timeStr = [NSString stringWithFormat:@"%zd秒之前", howLong / 1000];
+    } else if (howLong / 1000 / 60 > 0 && howLong / 1000 / 60 < 60){ //单位分钟
+        
+        timeStr = [NSString stringWithFormat:@"%zd分钟之前", howLong / 1000 / 60];
+    } else if (howLong / 1000 / 60 / 60 > 0 && howLong / 1000 / 60 / 60 < 24){ //单位小时
+        
+        timeStr = [NSString stringWithFormat:@"%zd小时之前", howLong / 1000 / 60 / 60];
+    } else if (howLong / 1000 / 60 / 60 / 24 > 0 && howLong / 1000 / 60 / 60 / 24 < 30){ //单位天
+        
+        timeStr = [NSString stringWithFormat:@"%zd天之前", howLong / 1000 / 60 / 60 / 24];
+    } else if (howLong / 1000 / 60 / 60 / 24 / 30 > 0 && howLong / 1000 / 60 / 60 / 24 / 30 < 12){ //单位月
+        
+        timeStr = [NSString stringWithFormat:@"%zd个月之前", howLong / 1000 / 60 / 60 / 24 / 30];
+    } else if (howLong / 1000 / 60 / 60 / 24 / 30 / 12 > 0){ //单位年
+        
+        timeStr = [NSString stringWithFormat:@"%zd年之前", howLong / 1000 / 60 / 60 / 24 / 30 / 12];
+    }
+    
+    return timeStr;
+}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

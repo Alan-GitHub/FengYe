@@ -461,7 +461,8 @@
                 FYInterestingCell* inrstCell = [collectionView dequeueReusableCellWithReuseIdentifier:InterestCell forIndexPath:indexPath];
                 
                 inrstCell.interestGroupName.text = self.interestGroupAttr[index].interestGroupName;
-                [inrstCell.coverImage sd_setImageWithURL:[NSURL URLWithString:self.interestGroupAttr[index].coverImageURL]];
+                NSString* coverImageURL = [self.interestGroupAttr[index].coverImageURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+                [inrstCell.coverImage sd_setImageWithURL:[NSURL URLWithString:coverImageURL]];
                 inrstCell.coverImage.contentMode = UIViewContentModeScaleAspectFill;
                 
                 cell = inrstCell;
@@ -472,7 +473,8 @@
             {
                 FYModuleCell* drawboardCell = [collectionView dequeueReusableCellWithReuseIdentifier:ModuleCell forIndexPath:indexPath];
                 
-                [drawboardCell.coverImage sd_setImageWithURL:[NSURL URLWithString:self.drawboardAttr[index].coverImageURL]];
+                NSString* coverImageURL = [self.drawboardAttr[index].coverImageURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+                [drawboardCell.coverImage sd_setImageWithURL:[NSURL URLWithString:coverImageURL]];
                 drawboardCell.coverImage.contentMode = UIViewContentModeScaleAspectFill;
                 
                 drawboardCell.drawboardName.text = self.drawboardAttr[index].drawboardName;
@@ -486,7 +488,8 @@
             {
                 FYUsersCell* userCell = [collectionView dequeueReusableCellWithReuseIdentifier:UsersCell forIndexPath:indexPath];
                 
-                [userCell.userHeadIcon sd_setImageWithURL:[NSURL URLWithString:self.attentionUsersAttr[index].userHeadIcon]];
+                NSString* userHeadIconURL = [self.attentionUsersAttr[index].userHeadIcon stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+                [userCell.userHeadIcon sd_setImageWithURL:[NSURL URLWithString:userHeadIconURL]];
                 userCell.userHeadIcon.layer.cornerRadius = (UsersCellWidth - 60) / 2;
                 userCell.userHeadIcon.layer.masksToBounds = YES;
                 userCell.userName.text = self.attentionUsersAttr[index].userName;

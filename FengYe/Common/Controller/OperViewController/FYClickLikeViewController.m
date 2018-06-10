@@ -117,7 +117,8 @@
     FYUsersCell* fansCell = [collectionView dequeueReusableCellWithReuseIdentifier:OperViewClickLike forIndexPath:indexPath];
     NSInteger index = [indexPath item];
     
-    [fansCell.userHeadIcon sd_setImageWithURL:[NSURL URLWithString:self.allLike[index].userHeadIcon]];
+    NSString* userHeadIconURL = [self.allLike[index].userHeadIcon stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [fansCell.userHeadIcon sd_setImageWithURL:[NSURL URLWithString:userHeadIconURL]];
     fansCell.userHeadIcon.layer.cornerRadius = (ItemWidth - 60) / 2;
     fansCell.userHeadIcon.layer.masksToBounds = YES;
     fansCell.userName.text = self.allLike[index].userName;

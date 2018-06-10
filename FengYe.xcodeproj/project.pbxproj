@@ -37,6 +37,7 @@
 		378EC32F205CC5F1003578D3 /* FYUsersCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 378EC32D205CC5F1003578D3 /* FYUsersCell.m */; };
 		378EC330205CC5F1003578D3 /* FYUsersCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 378EC32E205CC5F1003578D3 /* FYUsersCell.xib */; };
 		378EC333205CCEF8003578D3 /* FYScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 378EC332205CCEF8003578D3 /* FYScrollView.m */; };
+		379FE83220B9B41D0014F55C /* FYAddWorkInfoController.m in Sources */ = {isa = PBXBuildFile; fileRef = 379FE83120B9B41D0014F55C /* FYAddWorkInfoController.m */; };
 		37A2B714206EA641000E0C67 /* FYPersonalCenterHeaderData.m in Sources */ = {isa = PBXBuildFile; fileRef = 37A2B713206EA641000E0C67 /* FYPersonalCenterHeaderData.m */; };
 		37A72B60206757DB009975E1 /* FYDrawboardCellAdd.m in Sources */ = {isa = PBXBuildFile; fileRef = 37A72B5E206757DB009975E1 /* FYDrawboardCellAdd.m */; };
 		37A72B61206757DB009975E1 /* FYDrawboardCellAdd.xib in Resources */ = {isa = PBXBuildFile; fileRef = 37A72B5F206757DB009975E1 /* FYDrawboardCellAdd.xib */; };
@@ -132,6 +133,8 @@
 		378EC32E205CC5F1003578D3 /* FYUsersCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FYUsersCell.xib; sourceTree = "<group>"; };
 		378EC331205CCEF8003578D3 /* FYScrollView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYScrollView.h; sourceTree = "<group>"; };
 		378EC332205CCEF8003578D3 /* FYScrollView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYScrollView.m; sourceTree = "<group>"; };
+		379FE83020B9B41D0014F55C /* FYAddWorkInfoController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYAddWorkInfoController.h; sourceTree = "<group>"; };
+		379FE83120B9B41D0014F55C /* FYAddWorkInfoController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYAddWorkInfoController.m; sourceTree = "<group>"; };
 		37A2B712206EA641000E0C67 /* FYPersonalCenterHeaderData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYPersonalCenterHeaderData.h; sourceTree = "<group>"; };
 		37A2B713206EA641000E0C67 /* FYPersonalCenterHeaderData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FYPersonalCenterHeaderData.m; sourceTree = "<group>"; };
 		37A72B5D206757DB009975E1 /* FYDrawboardCellAdd.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FYDrawboardCellAdd.h; sourceTree = "<group>"; };
@@ -484,6 +487,8 @@
 				37F2314420819D7800BFDCD4 /* OperViewController */,
 				37F28E5820142A75003B07BD /* FYDetailInfoController.h */,
 				37F28E5920142A75003B07BD /* FYDetailInfoController.m */,
+				379FE83020B9B41D0014F55C /* FYAddWorkInfoController.h */,
+				379FE83120B9B41D0014F55C /* FYAddWorkInfoController.m */,
 				37F08A9B20275E1E00429C90 /* FYInterestGroupDetailController.h */,
 				37F08A9C20275E1E00429C90 /* FYInterestGroupDetailController.m */,
 				37F2314B2082051E00BFDCD4 /* FYSelectDrawNameViewController.h */,
@@ -770,9 +775,13 @@
 			files = (
 			);
 			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-FengYe/Pods-FengYe-resources.sh",
+				"${PODS_ROOT}/MJRefresh/MJRefresh/MJRefresh.bundle",
+				"${PODS_ROOT}/SVProgressHUD/SVProgressHUD/SVProgressHUD.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -869,6 +878,7 @@
 				370D0B311FDCF0B4004263E4 /* FYRecommendViewController.m in Sources */,
 				370D0B4A1FDD145D004263E4 /* FYMessageViewController.m in Sources */,
 				37F28E5A20142A75003B07BD /* FYDetailInfoController.m in Sources */,
+				379FE83220B9B41D0014F55C /* FYAddWorkInfoController.m in Sources */,
 				37F097D32056D5EA004D34D8 /* FYLikeViewController.m in Sources */,
 				37FDCEF91FDED6E90031BFC2 /* FYCollectionViewWaterFallLayout.m in Sources */,
 			);

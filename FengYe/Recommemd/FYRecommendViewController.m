@@ -15,6 +15,7 @@
 #import <MJExtension.h>
 #import "FYWorksUnitData.h"
 #import <UIImageView+WebCache.h>
+#import <MJRefresh.h>
 
 #define CollectionViewCellID @"CollectionViewCellID"
 
@@ -32,7 +33,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-//    self.view.backgroundColor = [UIColor redColor];
     
     //search bar
     [self addSearchBar];
@@ -40,6 +40,14 @@
     //collectionView
     [self.view addSubview:self.collectionView];
     self.waterFallLayout.data = self.worksUnitArrRecomd;
+    
+    //下拉刷新
+    self.collectionView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [self loadData];
+    }];
+    
+//    self.collectionView.mj_header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(loadData)];
+//    [self.collectionView.mj_header beginRefreshing];
     
     [self loadData];
 }
@@ -62,9 +70,7 @@
     NSError* error;
     NSData* jsonData = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:&error];
     NSString* jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    
-//    NSLog(@"jsonString=%@", jsonString);
-    
+
     AFURLSessionManager* manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
     
     NSMutableURLRequest* req = [[AFJSONRequestSerializer serializer] requestWithMethod:@"POST" URLString:url parameters:nil error:nil];
@@ -74,14 +80,17 @@
     [req setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [req setValue:@"application/json" forHTTPHeaderField:@"Accept"];
     [req setHTTPBody:[jsonString dataUsingEncoding:NSUTF8StringEncoding]];
-    
-//    NSLog(@"req=%@", req);
-    
+
     [[manager dataTaskWithRequest:req completionHandler:^(NSURLResponse * _Nonnull response, NSDictionary*  _Nullable responseObject, NSError * _Nullable error) {
         if(!error){
+            
             //NSLog(@"Reply JSON: %@", responseObject);
+            [self.worksUnitArrRecomd removeAllObjects];
             [self.worksUnitArrRecomd addObjectsFromArray:[FYWorksUnitData mj_objectArrayWithKeyValuesArray:responseObject[@"unitData"]]];
             [self.collectionView reloadData];
+            
+            //结束刷新
+            [self.collectionView.mj_header endRefreshing];
             
         } else{
             NSLog(@"Error: %@, %@, %@", error, response, responseObject);
@@ -143,7 +152,8 @@
 
     FYWorksUnitData* data = self.worksUnitArrRecomd[indexPath.item];
     
-    [cell.workImage sd_setImageWithURL:[NSURL URLWithString:data.picURL] completed:nil];
+    NSString* workURL = [data.picURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [cell.workImage sd_setImageWithURL:[NSURL URLWithString:workURL] completed:nil];
     
     //转采数量
     NSString* zhuanCaiTxt = data.forwardCount > 0 ? [NSString stringWithFormat:@"%zd", data.forwardCount] : @"";
@@ -158,7 +168,8 @@
     cell.commentLabel.text = commentTxt;
 
     cell.descriptionLabel.text = data.descriptionText;
-    [cell.headerIcon sd_setImageWithURL:[NSURL URLWithString:data.headIcon] completed:nil];
+    NSString* headiconURL = [data.headIcon stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [cell.headerIcon sd_setImageWithURL:[NSURL URLWithString:headiconURL] completed:nil];
     cell.usernameLabel.text = data.owner;
     cell.workModuleLabel.text = data.templateName;
     

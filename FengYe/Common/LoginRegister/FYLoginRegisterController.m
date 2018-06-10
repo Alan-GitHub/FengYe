@@ -11,6 +11,7 @@
 #import "CommonAttr.h"
 #import <AFNetworking.h>
 #import "FYTabBarController.h"
+#import <SVProgressHUD.h>
 
 @interface FYLoginRegisterController ()
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *leadCons;
@@ -84,8 +85,6 @@
                 NSString* registerPassword = [notification.userInfo objectForKey:@"registerPassword"];
                 //deal with login req
                 NSInteger ret = [self handleRegisterReqWithUsername:registerName andPassword:registerPassword];
-            
-                [self dismissViewControllerAnimated:YES completion:nil];
             }
             break;
             
@@ -131,7 +130,7 @@
             //NSLog(@"Reply JSON: %@", responseObject);
             int value = [[responseObject objectForKey:@"loginStatus"] intValue];
             
-            if (0 == value) { //login successful
+            if (1 == value) { //login successful
                 
                 NSUserDefaults* userdef = [NSUserDefaults standardUserDefaults];
                 [userdef setObject:name forKey:@"loginName"];
@@ -145,6 +144,21 @@
                     tabvc.selectedIndex = 3;
                 } else {
                     tabvc.selectedIndex = 2;
+                }
+            } else{
+                
+                switch (value) {
+                    case -1:
+                        [SVProgressHUD showErrorWithStatus:@"用户名不存在"];
+                        break;
+                        
+                    case -2:
+                        [SVProgressHUD showErrorWithStatus:@"密码错误"];
+                        break;
+                        
+                    default:
+                        [SVProgressHUD showErrorWithStatus:@"登录发生未知错误"];
+                        break;
                 }
             }
             
@@ -187,22 +201,53 @@
     [req setValue:@"application/json" forHTTPHeaderField:@"Accept"];
     [req setHTTPBody:[jsonString dataUsingEncoding:NSUTF8StringEncoding]];
     
-    NSLog(@"req=%@", req);
-    
     [[manager dataTaskWithRequest:req completionHandler:^(NSURLResponse * _Nonnull response, NSDictionary*  _Nullable responseObject, NSError * _Nullable error) {
         if(!error){
-            NSLog(@"Reply JSON: %@", responseObject);
-            //            NSString* strName = responseObject[@"registerName"];
-            //            NSString* strPd = responseObject[@"registerPassword"];
-            
-            //NSLog(@"name=%@, paswd=%@", strName, strPd);
-            
+            //NSLog(@"Reply JSON: %@", responseObject);
+            NSInteger retValue = [responseObject[@"retValue"] integerValue];
+            if (1 == retValue) { //注册成功
+                
+                [SVProgressHUD showInfoWithStatus:@"注册成功"];
+                
+                NSMutableDictionary* loginInfo = [NSMutableDictionary dictionary];
+                loginInfo[@"name"] = name;
+                loginInfo[@"password"] = passwd;
+                [self performSelector:@selector(loginAfterRegister:) withObject:loginInfo afterDelay:1.0];
+             
+            } else{ //注册失败
+                switch (retValue) {
+                    case -1:
+                        [SVProgressHUD showErrorWithStatus:@"注册失败!"];
+                        break;
+                        
+                    case -2:
+                        [SVProgressHUD showErrorWithStatus:@"用户名已经存在，请换个用户名试试"];
+                        break;
+                        
+                    default:
+                        [SVProgressHUD showErrorWithStatus:@"注册发生未知错误!"];
+                        break;
+                }
+            }
         } else{
-            
+            [SVProgressHUD showErrorWithStatus:@"应用通信发生未知错误"];
         }
     }] resume];
     
     return 0;
+}
+
+- (void) loginAfterRegister:(NSDictionary*)loginInfo {
+    
+    NSUserDefaults* userdef = [NSUserDefaults standardUserDefaults];
+    [userdef setObject:loginInfo[@"name"] forKey:@"loginName"];
+    [userdef setObject:loginInfo[@"password"] forKey:@"loginPassword"];
+    [userdef setObject:@"true" forKey:@"isLogin"];
+    
+    [self dismissViewControllerAnimated:YES completion:nil];
+    
+    FYTabBarController *tabvc =  (FYTabBarController *) [UIApplication sharedApplication].keyWindow.rootViewController;
+    tabvc.selectedIndex = 3;
 }
 
 - (void)dealloc{

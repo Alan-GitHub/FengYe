@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface FYDetailPrivateViewController : UITableViewController
+@interface FYDetailPrivateViewController : UIViewController
 
 @property(nonatomic, copy) NSString* privMsgUsername;
 @property(nonatomic, copy) NSString* privMsgUserHeadIconUrl;

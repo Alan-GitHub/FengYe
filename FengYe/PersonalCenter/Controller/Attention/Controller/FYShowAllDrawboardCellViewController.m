@@ -62,7 +62,8 @@
     FYModuleCell* drawboardCell = [collectionView dequeueReusableCellWithReuseIdentifier:DrawboardCell forIndexPath:indexPath];
     NSInteger index = [indexPath item];
     
-    [drawboardCell.coverImage sd_setImageWithURL:[NSURL URLWithString:self.allDrawboardCellAttr[index].coverImageURL]];
+    NSString* coverImageURL = [self.allDrawboardCellAttr[index].coverImageURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [drawboardCell.coverImage sd_setImageWithURL:[NSURL URLWithString:coverImageURL]];
     drawboardCell.coverImage.contentMode = UIViewContentModeScaleAspectFill;
     
     drawboardCell.drawboardName.text = self.allDrawboardCellAttr[index].drawboardName;

@@ -63,37 +63,21 @@
 
 - (void)tabBar:(UITabBar *)tabBar didSelectItem:(UITabBarItem *)item
 {
-
-//    if (self.childViewControllers.count == 2) {
-//
-//        //重新添加动态子视图控制器
-//        FYMessageViewController* messageVC = [[FYMessageViewController alloc] init];
-//        UINavigationController* navMessageVC = [[UINavigationController alloc] initWithRootViewController:messageVC];
-//        navMessageVC.tabBarItem.title = @"动态";
-//        [self addChildViewController:navMessageVC];
-//
-//        //重新添加个人中心子视图控制器
-//        FYPersonalCenterViewController* personalCenterVC = [[FYPersonalCenterViewController alloc] init];
-//        UINavigationController* navPersonalCenterVC = [[UINavigationController alloc] initWithRootViewController:personalCenterVC];
-//        navPersonalCenterVC.tabBarItem.title = @"个人中心";
-//        [self addChildViewController:navPersonalCenterVC];
-//    }
-    
     if ([item.title isEqualToString:@"推荐"]) {
         
-        NSLog(@"you just now click 推荐");
+        //NSLog(@"you just now click 推荐");
     }
     else if ([item.title isEqualToString:@"发现"]){
         
-        NSLog(@"you just now click 发现");
+        //NSLog(@"you just now click 发现");
     }
     else if ([item.title isEqualToString:@"动态"]){
         
-        NSLog(@"you just now click 动态");
+        //NSLog(@"you just now click 动态");
     }
     else{ //个人中心
         
-        NSLog(@"you just now click 个人中心");
+        //NSLog(@"you just now click 个人中心");
     }
 }
 

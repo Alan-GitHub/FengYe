@@ -113,13 +113,25 @@
     FYDisplayCell* cell = [collectionView dequeueReusableCellWithReuseIdentifier:ThirdCollectionViewCellID forIndexPath:indexPath];
  
     FYWorksUnitData* data = self.gLikeUnitAttr[indexPath.item];
-    [cell.workImage sd_setImageWithURL:[NSURL URLWithString:data.picURL] completed:nil];
-    cell.zhuanCaiLabel.text = [NSString stringWithFormat:@"%zd", data.forwardCount];
-    cell.loveLabel.text = [NSString stringWithFormat:@"%zd", data.likeCount];
-    cell.commentLabel.text = [NSString stringWithFormat:@"%zd", data.commentCount];
+    
+    NSString* workURL = [data.picURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [cell.workImage sd_setImageWithURL:[NSURL URLWithString:workURL] completed:nil];
+    
+    //转发数量
+    NSString* zhuanCaiTxt = data.forwardCount > 0 ? [NSString stringWithFormat:@"%zd", data.forwardCount] : @"";
+    cell.zhuanCaiLabel.text = zhuanCaiTxt;
+    
+    //喜欢数量
+    NSString* loveTxt = data.likeCount > 0 ? [NSString stringWithFormat:@"%zd", data.likeCount] : @"";
+    cell.loveLabel.text = loveTxt;
+    
+    //评论数量
+    NSString* commentTxt = data.commentCount > 0 ? [NSString stringWithFormat:@"%zd", data.commentCount] : @"";
+    cell.commentLabel.text = commentTxt;
     
     cell.descriptionLabel.text = data.descriptionText;
-    [cell.headerIcon sd_setImageWithURL:[NSURL URLWithString:data.headIcon] completed:nil];
+    NSString* headiconURL = [data.headIcon stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [cell.headerIcon sd_setImageWithURL:[NSURL URLWithString:headiconURL] completed:nil];
     cell.usernameLabel.text = data.owner;
     cell.workModuleLabel.text = data.templateName;
     

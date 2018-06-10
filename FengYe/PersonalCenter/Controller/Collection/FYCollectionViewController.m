@@ -113,7 +113,8 @@
     FYDisplayCell* cell = [collectionView dequeueReusableCellWithReuseIdentifier:SecondCollectionViewCellID forIndexPath:indexPath];
     
     FYWorksUnitData* data = self.gCollectionUnitAttr[indexPath.item];
-    [cell.workImage sd_setImageWithURL:[NSURL URLWithString:data.picURL] completed:nil];
+    NSString* workURL = [data.picURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [cell.workImage sd_setImageWithURL:[NSURL URLWithString:workURL] completed:nil];
     
     //转采数量
     NSString* zhuanCaiTxt = data.forwardCount > 0 ? [NSString stringWithFormat:@"%zd", data.forwardCount] : @"";
@@ -127,8 +128,10 @@
     NSString* commentTxt = data.commentCount > 0 ? [NSString stringWithFormat:@"%zd", data.commentCount] : @"";
     cell.commentLabel.text = commentTxt;
     
+    //头像
     cell.descriptionLabel.text = data.descriptionText;
-    [cell.headerIcon sd_setImageWithURL:[NSURL URLWithString:data.headIcon] completed:nil];
+    NSString* headiconURL = [data.headIcon stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [cell.headerIcon sd_setImageWithURL:[NSURL URLWithString:headiconURL] completed:nil];
     cell.usernameLabel.text = data.owner;
     cell.workModuleLabel.text = data.templateName;
     

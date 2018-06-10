@@ -20,6 +20,8 @@
 #import "FYSelectDrawNameViewController.h"
 #import "FYClickForwardViewController.h"
 #import "FYClickCommentViewController.h"
+#import "FYAddWorkInfoController.h"
+#import "FYLoginRegisterController.h"
 
 
 #define CollectionViewCellID @"CollectionViewCellID"
@@ -42,7 +44,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
-    [self addLikeAndCollecBtn];
+    [self addNavigationRightBtn];
 
     CGFloat offsetY = 0;
     CGFloat spacing = 10;
@@ -56,7 +58,8 @@
     
     UIImageView* imageview = [[UIImageView alloc] init];
     imageview.frame = CGRectMake(0, offsetY, ScreenWidth, imageHeight);
-    [imageview sd_setImageWithURL:[NSURL URLWithString:self.unitData.picURL] completed:nil];
+    NSString* imageviewURL = [self.unitData.picURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [imageview sd_setImageWithURL:[NSURL URLWithString:imageviewURL] completed:nil];
     [detailView addSubview:imageview];
     
     offsetY += imageHeight + spacing;
@@ -132,34 +135,65 @@
     
 }
 
-- (void) addLikeAndCollecBtn{
+- (void) addNavigationRightBtn{
+
+    NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+    NSString* loginName = [userDef objectForKey:@"loginName"];
     
-    //喜欢按钮
-    UIButton *likeBtn = [UIButton buttonWithType: UIButtonTypeCustom];
-    [likeBtn setTitle:@"♡" forState:UIControlStateNormal];
-    [likeBtn setTitle:@"❤️" forState:UIControlStateSelected];
-    [likeBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [likeBtn sizeToFit];
-    likeBtn.tag = 1;
-    [likeBtn addTarget:self action:@selector(LikeBtnClicked:) forControlEvents: UIControlEventTouchUpInside];
-    UIBarButtonItem  *likeBarBtn = [[UIBarButtonItem alloc] initWithCustomView: likeBtn];
+    if (self.unitData.owner.length && ![self.unitData.owner isEqualToString:loginName]) { //进入的是别人的个人中心
+        
+        //喜欢按钮
+        UIButton *likeBtn = [UIButton buttonWithType: UIButtonTypeCustom];
+        [likeBtn setTitle:@"♡" forState:UIControlStateNormal];
+        [likeBtn setTitle:@"❤️" forState:UIControlStateSelected];
+        [likeBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [likeBtn sizeToFit];
+        likeBtn.tag = 1;
+        [likeBtn addTarget:self action:@selector(LikeBtnClicked:) forControlEvents: UIControlEventTouchUpInside];
+        UIBarButtonItem  *likeBarBtn = [[UIBarButtonItem alloc] initWithCustomView: likeBtn];
+        
+        //采集按钮
+        UIButton *collecBtn = [UIButton buttonWithType: UIButtonTypeCustom];
+        [collecBtn setTitle:@"采集" forState:UIControlStateNormal];
+        collecBtn.titleLabel.font = [UIFont systemFontOfSize:13];
+        [collecBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [collecBtn sizeToFit];
+        collecBtn.tag = 2;
+        [collecBtn addTarget:self action:@selector(collecBtnClicked:) forControlEvents: UIControlEventTouchUpInside];
+        UIBarButtonItem  *collecBarBtn = [[UIBarButtonItem alloc] initWithCustomView: collecBtn];
+        
+        self.navigationItem.rightBarButtonItems = @[collecBarBtn, likeBarBtn];
+        
+    }else{ //进入了自己的个人中心界面
     
-    //采集按钮
-    UIButton *collecBtn = [UIButton buttonWithType: UIButtonTypeCustom];
-    [collecBtn setTitle:@"采集" forState:UIControlStateNormal];
-    collecBtn.titleLabel.font = [UIFont systemFontOfSize:13];
-    [collecBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-//    collecBtn.backgroundColor = [UIColor redColor];
-    [collecBtn sizeToFit];
-    collecBtn.tag = 2;
-    [collecBtn addTarget:self action:@selector(collecBtnClicked:) forControlEvents: UIControlEventTouchUpInside];
-    UIBarButtonItem  *collecBarBtn = [[UIBarButtonItem alloc] initWithCustomView: collecBtn];
- 
-    self.navigationItem.rightBarButtonItems = @[collecBarBtn, likeBarBtn];
+        //编辑按钮
+        UIButton *editBtn = [UIButton buttonWithType: UIButtonTypeCustom];
+        [editBtn setTitle:@"✏️" forState:UIControlStateNormal];
+        editBtn.titleLabel.font = [UIFont systemFontOfSize:13];
+        [editBtn sizeToFit];
+        editBtn.tag = 3;
+        [editBtn addTarget:self action:@selector(editBtnClicked:) forControlEvents: UIControlEventTouchUpInside];
+        UIBarButtonItem  *editBarBtn = [[UIBarButtonItem alloc] initWithCustomView: editBtn];
+        
+        self.navigationItem.rightBarButtonItems = @[editBarBtn];
+    }
 }
 
 - (void) LikeBtnClicked:(UIButton*) btn{
     
+    //检查是否已登录
+    NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+    Boolean isLogin = [[userDef objectForKey:@"isLogin"] boolValue];
+    if (!isLogin) { //未登录
+        
+        //弹出登录框
+        FYLoginRegisterController* login = [[FYLoginRegisterController alloc] init];
+        [self presentViewController:login animated:YES completion:nil];
+        
+        return;
+    }
+    
+    //已登录。继续往下走
     //切换喜欢按钮的状态
     btn.selected = !btn.selected;
     
@@ -177,7 +211,6 @@
     paramData[@"path"] = pictureUrl;
     
     //拿到当前登录用户的用户名
-    NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
     NSString* username = [userDef objectForKey:@"loginName"];
     paramData[@"username"] = username;
     
@@ -224,6 +257,19 @@
 
 - (void) collecBtnClicked:(UIButton*) btn{
     
+    //检查是否已登录
+    NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+    Boolean isLogin = [[userDef objectForKey:@"isLogin"] boolValue];
+    if (!isLogin) { //未登录
+        
+        //弹出登录框
+        FYLoginRegisterController* login = [[FYLoginRegisterController alloc] init];
+        [self presentViewController:login animated:YES completion:nil];
+        
+        return;
+    }
+    
+    //已登录。继续往下走
     NSMutableDictionary* parameters = [NSMutableDictionary dictionary];
     
     parameters[@"ver"] = @"1";
@@ -232,10 +278,8 @@
     parameters[@"time"] = @"20180126225600";
     
     NSMutableDictionary* paramData = [NSMutableDictionary dictionary];
-    
-    NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
-    NSString* username = [userDef objectForKey:@"loginName"];
-    paramData[@"username"] = username;
+
+    paramData[@"loginUser"] = [userDef objectForKey:@"loginName"];
  
     parameters[@"data"] = paramData;
     
@@ -281,6 +325,12 @@
     }] resume];
 }
 
+- (void) editBtnClicked:(UIButton*) btn{
+    
+    FYAddWorkInfoController* workInfoVC = [[FYAddWorkInfoController alloc] init];
+    workInfoVC.unitData = self.unitData;
+    [self presentViewController:workInfoVC animated:YES completion:nil];
+}
 
 //有画板封面
 - (UIView*) getWorksOwnerInfo:(FYWorksUnitData*) unitData{
@@ -295,8 +345,9 @@
     
     //用户头像
     UIImageView* headView = [[UIImageView alloc] initWithFrame:CGRectMake(spacing, offsetY, CellHeadIconRadius*2, CellHeadIconRadius*2)];
-    headView.backgroundColor = [UIColor greenColor];
-    [headView sd_setImageWithURL:[NSURL URLWithString:unitData.headIcon] completed:nil];
+    headView.backgroundColor = [UIColor lightGrayColor];
+    NSString* headviewURL = [unitData.headIcon stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [headView sd_setImageWithURL:[NSURL URLWithString:headviewURL] completed:nil];
     headView.layer.cornerRadius = CellHeadIconRadius;
     headView.layer.masksToBounds = YES;
     [worksOwnerInfo addSubview:headView];
@@ -320,8 +371,9 @@
     
     //画板模块(画板封面图片)
     UIImageView* drawbCover = [[UIImageView alloc] initWithFrame:CGRectMake(spacing, offsetY, CellHeadIconRadius*2, CellHeadIconRadius*2)];
-    drawbCover.backgroundColor = [UIColor greenColor];
-    [drawbCover sd_setImageWithURL:[NSURL URLWithString:unitData.headIcon] completed:nil];
+    drawbCover.backgroundColor = [UIColor lightGrayColor];
+    NSString* drawbCoverURL = [unitData.headIcon stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [drawbCover sd_setImageWithURL:[NSURL URLWithString:drawbCoverURL] completed:nil];
     drawbCover.layer.cornerRadius = 5;
     drawbCover.layer.masksToBounds = YES;
     [worksOwnerInfo addSubview:drawbCover];
@@ -349,7 +401,7 @@
 
     //time
     UILabel* time = [[UILabel alloc] init];
-    time.text = [NSString stringWithFormat:@"%zd", unitData.uploadTime];
+    time.text = [self timeFormatLocal: unitData.uploadTime];
     [time sizeToFit];
     [worksOperView addSubview:time];
 
@@ -654,14 +706,16 @@
     
     FYDisplayCell* cell = (FYDisplayCell*)[collectionView dequeueReusableCellWithReuseIdentifier:CollectionViewCellID forIndexPath:indexPath];
 
-    [cell.workImage sd_setImageWithURL:[NSURL URLWithString:self.worksUnitArrDetail[indexPath.item].picURL] completed:nil];
+    NSString* workURL = [self.worksUnitArrDetail[indexPath.item].picURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [cell.workImage sd_setImageWithURL:[NSURL URLWithString:workURL] completed:nil];
     cell.zhuanCaiLabel.text = [NSString stringWithFormat:@"%zd", self.worksUnitArrDetail[indexPath.item].forwardCount];
     cell.loveLabel.text = [NSString stringWithFormat:@"%zd", self.worksUnitArrDetail[indexPath.item].likeCount];
     cell.commentLabel.text = [NSString stringWithFormat:@"%zd", self.worksUnitArrDetail[indexPath.item].commentCount];
     
     cell.descriptionLabel.text = self.worksUnitArrDetail[indexPath.item].descriptionText;
     [cell setNeedsLayout];
-    [cell.headerIcon sd_setImageWithURL:[NSURL URLWithString:self.worksUnitArrDetail[indexPath.item].headIcon] completed:nil];
+    NSString* headiconURL = [self.worksUnitArrDetail[indexPath.item].headIcon stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [cell.headerIcon sd_setImageWithURL:[NSURL URLWithString:headiconURL] completed:nil];
     cell.usernameLabel.text = self.worksUnitArrDetail[indexPath.item].owner;
     cell.workModuleLabel.text = self.worksUnitArrDetail[indexPath.item].templateName;
     
@@ -678,6 +732,40 @@
     detail.hasRecommend = YES;
     
     [self.navigationController pushViewController:detail animated:YES];
+}
+
+- (NSString*) timeFormatLocal:(NSInteger) timeInMillis{
+
+    //获取当前时间
+    NSTimeInterval nowTime = [[NSDate date] timeIntervalSince1970] * 1000;
+    long long nowTimeInMillis = [[NSNumber numberWithDouble:nowTime] longLongValue];
+    
+    //当前时间与作品上传时间的差值
+    long long howLong = nowTimeInMillis - timeInMillis;
+
+    NSString* timeStr = nil;
+ 
+    if (howLong / 1000 > 0 && howLong / 1000 < 60) {  //单位秒
+        
+        timeStr = [NSString stringWithFormat:@"%zd秒之前", howLong / 1000];
+    } else if (howLong / 1000 / 60 > 0 && howLong / 1000 / 60 < 60){ //单位分钟
+        
+        timeStr = [NSString stringWithFormat:@"%zd分钟之前", howLong / 1000 / 60];
+    } else if (howLong / 1000 / 60 / 60 > 0 && howLong / 1000 / 60 / 60 < 24){ //单位小时
+        
+        timeStr = [NSString stringWithFormat:@"%zd小时之前", howLong / 1000 / 60 / 60];
+    } else if (howLong / 1000 / 60 / 60 / 24 > 0 && howLong / 1000 / 60 / 60 / 24 < 30){ //单位天
+        
+        timeStr = [NSString stringWithFormat:@"%zd天之前", howLong / 1000 / 60 / 60 / 24];
+    } else if (howLong / 1000 / 60 / 60 / 24 / 30 > 0 && howLong / 1000 / 60 / 60 / 24 / 30 < 12){ //单位月
+        
+        timeStr = [NSString stringWithFormat:@"%zd个月之前", howLong / 1000 / 60 / 60 / 24 / 30];
+    } else if (howLong / 1000 / 60 / 60 / 24 / 30 / 12 > 0){ //单位年
+        
+        timeStr = [NSString stringWithFormat:@"%zd年之前", howLong / 1000 / 60 / 60 / 24 / 30 / 12];
+    }
+    
+    return timeStr;
 }
 
 - (void)didReceiveMemoryWarning {

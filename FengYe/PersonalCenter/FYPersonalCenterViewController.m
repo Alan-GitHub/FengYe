@@ -24,6 +24,9 @@
 #import "FYShowAllFansViewController.h"
 #import "FYSettingsViewController.h"
 #import "uploadModel.h"
+#import <SVProgressHUD.h>
+#import <MJRefresh.h>
+#import "FYDetailPrivateViewController.h"
 
 #define TableViewCell @"TableViewCell"
 
@@ -31,18 +34,27 @@
 
 #define HeadIconHeight 60
 
-@interface FYPersonalCenterViewController ()<UITableViewDataSource, UITableViewDelegate, UIImagePickerControllerDelegate>
+@interface FYPersonalCenterViewController ()<UITableViewDataSource, UITableViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 @property(nonatomic, retain) UITableView* gTableView;
 @property(nonatomic, retain) UIScrollView* gScroView;
 @property(nonatomic, retain) UIView* gPersonInfo;
 @property(nonatomic, retain) UIView* gControlView;
 
+//用户名
+@property(nonatomic, retain) UILabel* gUsername;
+@property(nonatomic, retain) UILabel* gFans;
 
+@property(nonatomic, retain) UIView* gFourLabelBackView;
 @property(nonatomic, retain) UIView* gDrawboard;
 @property(nonatomic, retain) UIView* gCollection;
 @property(nonatomic, retain) UIView* gLike;
 @property(nonatomic, retain) UIView* gAttention;
 @property(nonatomic, assign) NSInteger gPrevClicked;
+
+@property(nonatomic, retain) UILabel* gDrawboardNums;
+@property(nonatomic, retain) UILabel* gCollectionNums;
+@property(nonatomic, retain) UILabel* gLikeNums;
+@property(nonatomic, retain) UILabel* gAttentionNums;
 
 @property(nonatomic, retain) NSMutableArray<UIView*>* gMenuAttr;
 @property(nonatomic, retain) FYPersonalCenterHeaderData* gHeaderData;
@@ -51,6 +63,8 @@
 @property(nonatomic, retain) UIImagePickerController* imagePicker;
 @property(nonatomic, retain) uploadModel* gModel;
 @property(nonatomic, retain) UIImageView* gPersonInfoHeadIcon;
+
+@property(nonatomic, retain) UIButton* gRegardBtn;
 
 @end
 
@@ -98,9 +112,11 @@
     [self addChildViewController:attentionVC];
     
     self.imagePicker.delegate = self;
-}
-
-- (void)viewWillAppear:(BOOL)animated{
+    
+    //下拉刷新
+    self.gTableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [self loadData];
+    }];
     
     [self loadData];
 }
@@ -116,15 +132,16 @@
     
     NSMutableDictionary* paramData = [NSMutableDictionary dictionary];
     
-    //加载指定用户的数据 -- 如果没有指定，则加载当前登录用户数据
+    //其他用户
     if (self.userName.length) {
-        paramData[@"username"] = self.userName;
-    } else {
-        NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
-        NSString* username = [userDef objectForKey:@"loginName"];
-        paramData[@"username"] = username;
+        paramData[@"otherUser"] = self.userName;
     }
-
+    
+    //登录用户
+    NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+    NSString* username = [userDef objectForKey:@"loginName"];
+    paramData[@"loginUser"] = username;
+    
     parameters[@"data"] = paramData;
     
     NSString* url = ServerURL;
@@ -146,6 +163,18 @@
         if(!error){
             //NSLog(@"Reply JSON: %@", responseObject);
             self.gHeaderData = [FYPersonalCenterHeaderData mj_objectWithKeyValues:responseObject[@"headerData"]];
+            
+            //结束刷新
+            [self.gTableView.mj_header endRefreshing];
+            
+            //把登录用户的头像路径存储起来以备使用
+            NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+            [userDef setObject:self.gHeaderData.headIconURL forKey:@"headIcon"];
+            
+            //正确设置关注按钮的状态
+            [self regardButtonStatus:self.gHeaderData.isAttention];
+            
+            //加载视图上半部分数据
             [self setupControlView: self.gControlView];
 
         } else{
@@ -156,16 +185,125 @@
 
 - (void) addNavRightButton{
     
-    UIButton *btn = [UIButton buttonWithType: UIButtonTypeCustom];
-    [btn setBackgroundImage:[UIImage imageNamed:@"mine-setting-iconN"] forState:UIControlStateNormal];
-    [btn sizeToFit];
-    [btn addTarget:self action:@selector(navRightButtonClicked) forControlEvents: UIControlEventTouchUpInside];
+    NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+    NSString* loginName = [userDef objectForKey:@"loginName"];
     
-    UIBarButtonItem  *barbtn = [[UIBarButtonItem alloc] initWithCustomView: btn];
-    self.navigationItem.rightBarButtonItem = barbtn;
+    if (self.userName.length && ![self.userName isEqualToString:loginName]) { //进入的是别人的个人中心
+        
+        UIButton *attentionBtn = [UIButton buttonWithType: UIButtonTypeCustom];
+        [attentionBtn setTitle:@"+关注" forState:UIControlStateNormal];
+        [attentionBtn setTitle:@"✔️" forState:UIControlStateSelected];
+        [attentionBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        attentionBtn.backgroundColor = [UIColor redColor];
+        attentionBtn.titleLabel.font = [UIFont systemFontOfSize:17];
+        [attentionBtn sizeToFit];
+        [attentionBtn addTarget:self action:@selector(regardButtonClicked:) forControlEvents: UIControlEventTouchUpInside];
+        self.gRegardBtn = attentionBtn;
+        UIBarButtonItem  *attentionBarBtn = [[UIBarButtonItem alloc] initWithCustomView: attentionBtn];
+        
+        //邮件消息按钮
+        UIButton *mailBtn = [UIButton buttonWithType: UIButtonTypeCustom];
+        [mailBtn setTitle:@"📧" forState:UIControlStateNormal];
+        mailBtn.titleLabel.font = [UIFont systemFontOfSize:20];
+        [mailBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [mailBtn sizeToFit];
+        [mailBtn addTarget:self action:@selector(mailBarBtnClicked:) forControlEvents: UIControlEventTouchUpInside];
+        UIBarButtonItem  *mailBarBtn = [[UIBarButtonItem alloc] initWithCustomView: mailBtn];
+        
+        self.navigationItem.rightBarButtonItems = @[attentionBarBtn, mailBarBtn];
+    
+    }else{ //进入了自己的个人中心界面
+        
+        UIButton *btn = [UIButton buttonWithType: UIButtonTypeCustom];
+        [btn setBackgroundImage:[UIImage imageNamed:@"mine-setting-iconN"] forState:UIControlStateNormal];
+        [btn sizeToFit];
+        [btn addTarget:self action:@selector(settingsButtonClicked) forControlEvents: UIControlEventTouchUpInside];
+        
+        UIBarButtonItem  *barbtn = [[UIBarButtonItem alloc] initWithCustomView: btn];
+        self.navigationItem.rightBarButtonItem = barbtn;
+    }
 }
 
-- (void) navRightButtonClicked{
+- (void) mailBarBtnClicked:(UIButton*) btn{
+    
+    FYDetailPrivateViewController* detailPrivateVC = [[FYDetailPrivateViewController alloc] init];
+    detailPrivateVC.privMsgUsername = self.userName;
+    detailPrivateVC.privMsgUserHeadIconUrl = self.gHeaderData.headIconURL;
+    [self.navigationController pushViewController:detailPrivateVC animated:YES];
+}
+
+- (void) regardButtonStatus:(bool) isChoice{
+
+    self.gRegardBtn.selected = isChoice;
+    if (self.gRegardBtn.selected) {
+        self.gRegardBtn.backgroundColor = [UIColor lightGrayColor];
+    }else{
+        self.gRegardBtn.backgroundColor = [UIColor redColor];
+    }
+}
+
+- (void) regardButtonClicked:(UIButton*) btn{
+    
+    btn.selected = !btn.selected;
+    if (btn.selected) {
+        btn.backgroundColor = [UIColor lightGrayColor];
+    }else{
+        btn.backgroundColor = [UIColor redColor];
+    }
+    
+    //更新数据库
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionary];
+    
+    parameters[@"ver"] = @"1";
+    parameters[@"service"] = @"USER_REGARD_OR_NOT";
+    parameters[@"biz"] = @"111";
+    parameters[@"time"] = @"20180126225600";
+    
+    NSMutableDictionary* paramData = [NSMutableDictionary dictionary];
+    
+    //当前登录用户
+    NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+    NSString* username = [userDef objectForKey:@"loginName"];
+    paramData[@"loginUser"] = username;
+    
+    //被关注用户
+    paramData[@"regardedUser"] = self.userName;
+    
+    //关注还是取消关注
+    paramData[@"regardOrNot"] = [NSString stringWithFormat:@"%zd", btn.selected];
+    
+    parameters[@"data"] = paramData;
+    
+    NSString* url = ServerURL;
+    NSError* error;
+    NSData* jsonData = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:&error];
+    NSString* jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    
+    AFURLSessionManager* manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+    
+    NSMutableURLRequest* req = [[AFJSONRequestSerializer serializer] requestWithMethod:@"POST" URLString:url parameters:nil error:nil];
+    
+    req.timeoutInterval = [[[NSUserDefaults standardUserDefaults] valueForKey:@"timeoutInterval"] longValue];
+    
+    [req setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [req setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+    [req setHTTPBody:[jsonString dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    [[manager dataTaskWithRequest:req completionHandler:^(NSURLResponse * _Nonnull response, NSDictionary*  _Nullable responseObject, NSError * _Nullable error) {
+        if(!error){
+            //NSLog(@"Reply JSON: %@", responseObject);
+            NSInteger retValue = [responseObject[@"retCode"] integerValue];
+            if (retValue == 0) {
+                [SVProgressHUD showErrorWithStatus:@"处理错误"];
+            }
+        } else{
+            NSLog(@"Error: %@, %@, %@", error, response, responseObject);
+            [SVProgressHUD showErrorWithStatus:@"网络故障"];
+        }
+    }] resume];
+}
+
+- (void) settingsButtonClicked{
     
     FYSettingsViewController* settingsVC = [[FYSettingsViewController alloc] init];
     [self.navigationController pushViewController:settingsVC animated:YES];
@@ -182,250 +320,293 @@
 - (void) addPersonInfoView: (UIView*) controlView{
     
     //back view
-    UIView* personInfo = [[UIView alloc] init];
-    [controlView addSubview:personInfo];
-    [personInfo mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(controlView.mas_top).with.offset(10);
-        make.left.equalTo(controlView.mas_left).with.offset(0);
-        make.right.equalTo(controlView.mas_right).with.offset(0);
-        make.height.mas_equalTo(HeadIconHeight);
-    }];
-    personInfo.backgroundColor = [UIColor whiteColor];
-    self.gPersonInfo = personInfo;
+    if (!self.gPersonInfo) {
+        
+        UIView* personInfo = [[UIView alloc] init];
+        [controlView addSubview:personInfo];
+        [personInfo mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(controlView.mas_top).with.offset(10);
+            make.left.equalTo(controlView.mas_left).with.offset(0);
+            make.right.equalTo(controlView.mas_right).with.offset(0);
+            make.height.mas_equalTo(HeadIconHeight);
+        }];
+        personInfo.backgroundColor = [UIColor whiteColor];
+        self.gPersonInfo = personInfo;
+    }
     
     //head icon view
-    UIImageView* imageView = [[UIImageView alloc] init];
-    [personInfo addSubview:imageView];
-    [imageView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(personInfo).with.offset(0);
-        make.left.equalTo(personInfo.mas_left).with.offset(20);
-        make.bottom.equalTo(personInfo.mas_bottom).with.offset(0);
-        make.width.equalTo(personInfo.mas_height);
-    }];
-    imageView.backgroundColor = [UIColor yellowColor];
+    if (!self.gPersonInfoHeadIcon) {
+        
+        UIImageView* imageView = [[UIImageView alloc] init];
+        [self.gPersonInfo addSubview:imageView];
+        [imageView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(self.gPersonInfo).with.offset(0);
+            make.left.equalTo(self.gPersonInfo.mas_left).with.offset(20);
+            make.bottom.equalTo(self.gPersonInfo.mas_bottom).with.offset(0);
+            make.width.equalTo(self.gPersonInfo.mas_height);
+        }];
+        imageView.backgroundColor = [UIColor clearColor];
+        self.gPersonInfoHeadIcon = imageView;
+        
+        //给用户头像添加点击事件
+        NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+        NSString* loginName = [userDef objectForKey:@"loginName"];
+        
+        if (self.userName.length && ![self.userName isEqualToString:loginName]) { //进入的是别人的个人中心
+            //别人的头像，你没有权限修改
+        }else{
+            
+            UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(changeHeadIcon)];
+            [imageView addGestureRecognizer:tap];
+            imageView.userInteractionEnabled = YES;
+        }
+    }
     //加载网络图片之前，先清除缓存
     [[SDImageCache sharedImageCache] clearMemory];
     [[SDImageCache sharedImageCache] clearDisk];
-    [imageView sd_setImageWithURL:[NSURL URLWithString:self.gHeaderData.headIconURL] completed:nil];
-    imageView.layer.cornerRadius = HeadIconHeight/2;
-    imageView.layer.masksToBounds = YES;
-    self.gPersonInfoHeadIcon = imageView;
-    
-    //给用户头像添加点击事件
-    UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(changeHeadIcon)];
-    [imageView addGestureRecognizer:tap];
-    imageView.userInteractionEnabled = YES;
-    
+    NSString* headiconURL = [self.gHeaderData.headIconURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [self.gPersonInfoHeadIcon sd_setImageWithURL:[NSURL URLWithString:headiconURL] placeholderImage:[UIImage imageNamed:@"defaultUserIcon"] completed:nil];
+    self.gPersonInfoHeadIcon.layer.cornerRadius = HeadIconHeight/2;
+    self.gPersonInfoHeadIcon.layer.masksToBounds = YES;
+ 
     //name label
-    UILabel* username = [[UILabel alloc] init];
-    [personInfo addSubview:username];
-    [username mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(imageView.mas_top).with.offset(5);
-        make.left.equalTo(imageView.mas_right).with.offset(10);
-    }];
-    username.text = self.gHeaderData.username;
-    username.font = [UIFont systemFontOfSize:20];
-    [username sizeToFit];
+    if (!self.gUsername) {
+        
+        UILabel* username = [[UILabel alloc] init];
+        [self.gPersonInfo addSubview:username];
+        [username mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(self.gPersonInfoHeadIcon.mas_top).with.offset(5);
+            make.left.equalTo(self.gPersonInfoHeadIcon.mas_right).with.offset(10);
+        }];
+        self.gUsername.font = [UIFont systemFontOfSize:20];
+        self.gUsername = username;
+    }
+    self.gUsername.text = self.gHeaderData.username;
+    [self.gUsername sizeToFit];
     
     //fans
-    UILabel* fans = [[UILabel alloc] init];
-    [personInfo addSubview:fans];
-    [fans mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.bottom.equalTo(imageView.mas_bottom).with.offset(-5);
-        make.left.equalTo(imageView.mas_right).with.offset(10);
-    }];
-    fans.text = [NSString stringWithFormat: @"%zd fans >", self.gHeaderData.fansNum] ;
-    fans.font = [UIFont systemFontOfSize:13];
-    [fans sizeToFit];
-    
-    tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(clickedFansLabel:)];
-    fans.userInteractionEnabled = YES;
-    [fans addGestureRecognizer:tap];
+    if (!self.gFans) {
+        
+        UILabel* fans = [[UILabel alloc] init];
+        [self.gPersonInfo addSubview:fans];
+        [fans mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.bottom.equalTo(self.gPersonInfoHeadIcon.mas_bottom).with.offset(-5);
+            make.left.equalTo(self.gPersonInfoHeadIcon.mas_right).with.offset(10);
+        }];
+        self.gFans = fans;
+        self.gFans.font = [UIFont systemFontOfSize:13];
+        
+        UITapGestureRecognizer* tapFans = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(clickedFansLabel:)];
+        fans.userInteractionEnabled = YES;
+        [fans addGestureRecognizer:tapFans];
+    }
+    self.gFans.text = [NSString stringWithFormat: @"%zd fans >", self.gHeaderData.fansNum] ;
+    [self.gFans sizeToFit];
 }
 
 - (void) addFourLabelView: (UIView*) controlView{
     
     //back view
-    UIView* fourLabelBackView = [[UIView alloc] init];
-    [controlView addSubview:fourLabelBackView];
-    [fourLabelBackView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.gPersonInfo.mas_bottom).with.offset(40);
-        make.left.equalTo(controlView.mas_left).with.offset(0);
-        make.bottom.equalTo(controlView.mas_bottom).with.offset(-10);
-        make.right.equalTo(controlView.mas_right).with.offset(0);
-    }];
-    fourLabelBackView.backgroundColor = [UIColor whiteColor];
+    if (!self.gFourLabelBackView) {
+        
+        UIView* fourLabelBackView = [[UIView alloc] init];
+        [controlView addSubview:fourLabelBackView];
+        [fourLabelBackView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(self.gPersonInfo.mas_bottom).with.offset(40);
+            make.left.equalTo(controlView.mas_left).with.offset(0);
+            make.bottom.equalTo(controlView.mas_bottom).with.offset(-10);
+            make.right.equalTo(controlView.mas_right).with.offset(0);
+        }];
+        fourLabelBackView.backgroundColor = [UIColor whiteColor];
+        self.gFourLabelBackView = fourLabelBackView;
+    }
     
     CGFloat labelSpacing = 10;
     CGFloat labelWidth = (ScreenWidth - labelSpacing * 8)/4;
     
     //draw board view
-    UIView* drawboard = [[UIView alloc] init];
-    [fourLabelBackView addSubview:drawboard];
-    [drawboard mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(fourLabelBackView.mas_top).with.offset(0);
-        make.left.equalTo(fourLabelBackView.mas_left).with.offset(labelSpacing);
-        make.bottom.equalTo(fourLabelBackView.mas_bottom).with.offset(0);
-        make.width.mas_equalTo(labelWidth);
-    }];
-    drawboard.backgroundColor = [UIColor lightGrayColor];
-    self.gDrawboard = drawboard;
-    [self.gMenuAttr addObject:drawboard];
-    
-    UITapGestureRecognizer* tapDrawBoard = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction:)];
-    drawboard.tag = 0;
-    [drawboard addGestureRecognizer:tapDrawBoard];
-    
-    UILabel* drawboardNums = [[UILabel alloc] init];
-    [drawboard addSubview:drawboardNums];
-    [drawboardNums mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(drawboard.mas_top).with.offset(0);
-        make.left.equalTo(drawboard.mas_left).with.offset(0);
-        make.right.equalTo(drawboard.mas_right).with.offset(0);
-        make.height.mas_equalTo(drawboard.mas_height).multipliedBy(0.5);
-    }];
-    drawboardNums.backgroundColor = [UIColor clearColor];
-    drawboardNums.text = [NSString stringWithFormat:@"%zd", self.gHeaderData.drawboardNum];
-    drawboardNums.textAlignment = NSTextAlignmentCenter;
-    
-    UILabel* drawboardTitle = [[UILabel alloc] init];
-    [drawboard addSubview:drawboardTitle];
-    [drawboardTitle mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(drawboardNums.mas_bottom).with.offset(0);
-        make.left.equalTo(drawboard.mas_left).with.offset(0);
-        make.right.equalTo(drawboard.mas_right).with.offset(0);
-        make.bottom.equalTo(drawboard.mas_bottom).with.offset(0);
-    }];
-    drawboardTitle.backgroundColor = [UIColor clearColor];
-    drawboardTitle.text = @"画板";
-    drawboardTitle.font = [UIFont systemFontOfSize:13];
-    drawboardTitle.textAlignment = NSTextAlignmentCenter;
+    if (!self.gDrawboard) {
+        
+        UIView* drawboard = [[UIView alloc] init];
+        [self.gFourLabelBackView addSubview:drawboard];
+        [drawboard mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(self.gFourLabelBackView.mas_top).with.offset(0);
+            make.left.equalTo(self.gFourLabelBackView.mas_left).with.offset(labelSpacing);
+            make.bottom.equalTo(self.gFourLabelBackView.mas_bottom).with.offset(0);
+            make.width.mas_equalTo(labelWidth);
+        }];
+        drawboard.backgroundColor = [UIColor lightGrayColor];
+        self.gDrawboard = drawboard;
+        [self.gMenuAttr addObject:drawboard];
+        
+        UITapGestureRecognizer* tapDrawBoard = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction:)];
+        drawboard.tag = 0;
+        [drawboard addGestureRecognizer:tapDrawBoard];
+        
+        UILabel* drawboardNums = [[UILabel alloc] init];
+        [drawboard addSubview:drawboardNums];
+        [drawboardNums mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(drawboard.mas_top).with.offset(0);
+            make.left.equalTo(drawboard.mas_left).with.offset(0);
+            make.right.equalTo(drawboard.mas_right).with.offset(0);
+            make.height.mas_equalTo(drawboard.mas_height).multipliedBy(0.5);
+        }];
+        drawboardNums.backgroundColor = [UIColor clearColor];
+        self.gDrawboardNums = drawboardNums;
+        drawboardNums.textAlignment = NSTextAlignmentCenter;
+        
+        UILabel* drawboardTitle = [[UILabel alloc] init];
+        [drawboard addSubview:drawboardTitle];
+        [drawboardTitle mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(drawboardNums.mas_bottom).with.offset(0);
+            make.left.equalTo(drawboard.mas_left).with.offset(0);
+            make.right.equalTo(drawboard.mas_right).with.offset(0);
+            make.bottom.equalTo(drawboard.mas_bottom).with.offset(0);
+        }];
+        drawboardTitle.backgroundColor = [UIColor clearColor];
+        drawboardTitle.text = @"画板";
+        drawboardTitle.font = [UIFont systemFontOfSize:13];
+        drawboardTitle.textAlignment = NSTextAlignmentCenter;
+    }
+    self.gDrawboardNums.text = [NSString stringWithFormat:@"%zd", self.gHeaderData.drawboardNum];
 
     //collection view
-    UIView* collection = [[UIView alloc] init];
-    [fourLabelBackView addSubview:collection];
-    [collection mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(fourLabelBackView.mas_top).with.offset(0);
-        make.left.equalTo(drawboard.mas_right).with.offset(labelSpacing*2);
-        make.bottom.equalTo(fourLabelBackView.mas_bottom).with.offset(0);
-        make.width.mas_equalTo(labelWidth);
-    }];
-    collection.backgroundColor = [UIColor clearColor];
-    self.gCollection = collection;
-    [self.gMenuAttr addObject:collection];
-    
-    UITapGestureRecognizer* tapCollection = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction:)];
-    collection.tag = 1;
-    [collection addGestureRecognizer:tapCollection];
-    
-    UILabel* collectionNums = [[UILabel alloc] init];
-    [collection addSubview:collectionNums];
-    [collectionNums mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(collection.mas_top).with.offset(0);
-        make.left.equalTo(collection.mas_left).with.offset(0);
-        make.right.equalTo(collection.mas_right).with.offset(0);
-        make.height.mas_equalTo(collection.mas_height).multipliedBy(0.5);
-    }];
-    collectionNums.backgroundColor = [UIColor clearColor];
-    collectionNums.text = [NSString stringWithFormat:@"%zd", self.gHeaderData.collectionNum];
-    collectionNums.textAlignment = NSTextAlignmentCenter;
-    
-    UILabel* collectionTitle = [[UILabel alloc] init];
-    [collection addSubview:collectionTitle];
-    [collectionTitle mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(collectionNums.mas_bottom).with.offset(0);
-        make.left.equalTo(collection.mas_left).with.offset(0);
-        make.right.equalTo(collection.mas_right).with.offset(0);
-        make.bottom.equalTo(collection.mas_bottom).with.offset(0);
-    }];
-    collectionTitle.backgroundColor = [UIColor clearColor];
-    collectionTitle.text = @"采集";
-    collectionTitle.font = [UIFont systemFontOfSize:13];
-    collectionTitle.textAlignment = NSTextAlignmentCenter;
+    if (!self.gCollection) {
+        
+        UIView* collection = [[UIView alloc] init];
+        [self.gFourLabelBackView addSubview:collection];
+        [collection mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(self.gFourLabelBackView.mas_top).with.offset(0);
+            make.left.equalTo(self.gDrawboard.mas_right).with.offset(labelSpacing*2);
+            make.bottom.equalTo(self.gFourLabelBackView.mas_bottom).with.offset(0);
+            make.width.mas_equalTo(labelWidth);
+        }];
+        collection.backgroundColor = [UIColor clearColor];
+        self.gCollection = collection;
+        [self.gMenuAttr addObject:collection];
+        
+        UITapGestureRecognizer* tapCollection = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction:)];
+        collection.tag = 1;
+        [collection addGestureRecognizer:tapCollection];
+        
+        UILabel* collectionNums = [[UILabel alloc] init];
+        [collection addSubview:collectionNums];
+        [collectionNums mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(collection.mas_top).with.offset(0);
+            make.left.equalTo(collection.mas_left).with.offset(0);
+            make.right.equalTo(collection.mas_right).with.offset(0);
+            make.height.mas_equalTo(collection.mas_height).multipliedBy(0.5);
+        }];
+        collectionNums.backgroundColor = [UIColor clearColor];
+        self.gCollectionNums = collectionNums;
+        collectionNums.textAlignment = NSTextAlignmentCenter;
+        
+        UILabel* collectionTitle = [[UILabel alloc] init];
+        [collection addSubview:collectionTitle];
+        [collectionTitle mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(collectionNums.mas_bottom).with.offset(0);
+            make.left.equalTo(collection.mas_left).with.offset(0);
+            make.right.equalTo(collection.mas_right).with.offset(0);
+            make.bottom.equalTo(collection.mas_bottom).with.offset(0);
+        }];
+        collectionTitle.backgroundColor = [UIColor clearColor];
+        collectionTitle.text = @"采集";
+        collectionTitle.font = [UIFont systemFontOfSize:13];
+        collectionTitle.textAlignment = NSTextAlignmentCenter;
+    }
+    self.gCollectionNums.text = [NSString stringWithFormat:@"%zd", self.gHeaderData.collectionNum];
     
     //like view
-    UIView* like = [[UIView alloc] init];
-    [fourLabelBackView addSubview:like];
-    [like mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(fourLabelBackView.mas_top).with.offset(0);
-        make.left.equalTo(collection.mas_right).with.offset(labelSpacing*2);
-        make.bottom.equalTo(fourLabelBackView.mas_bottom).with.offset(0);
-        make.width.mas_equalTo(labelWidth);
-    }];
-    like.backgroundColor = [UIColor clearColor];
-    self.gLike = like;
-    [self.gMenuAttr addObject:like];
-    
-    UITapGestureRecognizer* tapLike = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction:)];
-    like.tag = 2;
-    [like addGestureRecognizer:tapLike];
-
-    UILabel* likeNums = [[UILabel alloc] init];
-    [like addSubview:likeNums];
-    [likeNums mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(like.mas_top).with.offset(0);
-        make.left.equalTo(like.mas_left).with.offset(0);
-        make.right.equalTo(like.mas_right).with.offset(0);
-        make.height.mas_equalTo(like.mas_height).multipliedBy(0.5);
-    }];
-    likeNums.backgroundColor = [UIColor clearColor];
-    likeNums.text = [NSString stringWithFormat:@"%zd", self.gHeaderData.likeNum];
-    likeNums.textAlignment = NSTextAlignmentCenter;
-    
-    UILabel* likeTitle = [[UILabel alloc] init];
-    [like addSubview:likeTitle];
-    [likeTitle mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(likeNums.mas_bottom).with.offset(0);
-        make.left.equalTo(like.mas_left).with.offset(0);
-        make.right.equalTo(like.mas_right).with.offset(0);
-        make.bottom.equalTo(like.mas_bottom).with.offset(0);
-    }];
-    likeTitle.backgroundColor = [UIColor clearColor];
-    likeTitle.text = @"喜欢";
-    likeTitle.font = [UIFont systemFontOfSize:13];
-    likeTitle.textAlignment = NSTextAlignmentCenter;
-    
+    if (!self.gLike) {
+        
+        UIView* like = [[UIView alloc] init];
+        [self.gFourLabelBackView addSubview:like];
+        [like mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(self.gFourLabelBackView.mas_top).with.offset(0);
+            make.left.equalTo(self.gCollection.mas_right).with.offset(labelSpacing*2);
+            make.bottom.equalTo(self.gFourLabelBackView.mas_bottom).with.offset(0);
+            make.width.mas_equalTo(labelWidth);
+        }];
+        like.backgroundColor = [UIColor clearColor];
+        self.gLike = like;
+        [self.gMenuAttr addObject:like];
+        
+        UITapGestureRecognizer* tapLike = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction:)];
+        like.tag = 2;
+        [like addGestureRecognizer:tapLike];
+        
+        UILabel* likeNums = [[UILabel alloc] init];
+        [like addSubview:likeNums];
+        [likeNums mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(like.mas_top).with.offset(0);
+            make.left.equalTo(like.mas_left).with.offset(0);
+            make.right.equalTo(like.mas_right).with.offset(0);
+            make.height.mas_equalTo(like.mas_height).multipliedBy(0.5);
+        }];
+        likeNums.backgroundColor = [UIColor clearColor];
+        self.gLikeNums = likeNums;
+        likeNums.textAlignment = NSTextAlignmentCenter;
+        
+        UILabel* likeTitle = [[UILabel alloc] init];
+        [like addSubview:likeTitle];
+        [likeTitle mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(likeNums.mas_bottom).with.offset(0);
+            make.left.equalTo(like.mas_left).with.offset(0);
+            make.right.equalTo(like.mas_right).with.offset(0);
+            make.bottom.equalTo(like.mas_bottom).with.offset(0);
+        }];
+        likeTitle.backgroundColor = [UIColor clearColor];
+        likeTitle.text = @"喜欢";
+        likeTitle.font = [UIFont systemFontOfSize:13];
+        likeTitle.textAlignment = NSTextAlignmentCenter;
+    }
+    self.gLikeNums.text = [NSString stringWithFormat:@"%zd", self.gHeaderData.likeNum];
+  
     //regard view
-    UIView* attention = [[UIView alloc] init];
-    [fourLabelBackView addSubview:attention];
-    [attention mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(fourLabelBackView.mas_top).with.offset(0);
-        make.left.equalTo(like.mas_right).with.offset(labelSpacing*2);
-        make.bottom.equalTo(fourLabelBackView.mas_bottom).with.offset(0);
-        make.width.mas_equalTo(labelWidth);
-    }];
-    attention.backgroundColor = [UIColor clearColor];
-    self.gAttention = attention;
-    [self.gMenuAttr addObject:attention];
-    
-    UITapGestureRecognizer* tapAttention = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction:)];
-    attention.tag = 3;
-    [attention addGestureRecognizer:tapAttention];
-    
-    UILabel* attentionNums = [[UILabel alloc] init];
-    [attention addSubview:attentionNums];
-    [attentionNums mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(attention.mas_top).with.offset(0);
-        make.left.equalTo(attention.mas_left).with.offset(0);
-        make.right.equalTo(attention.mas_right).with.offset(0);
-        make.height.mas_equalTo(attention.mas_height).multipliedBy(0.5);
-    }];
-    attentionNums.backgroundColor = [UIColor clearColor];
-    attentionNums.text = [NSString stringWithFormat:@"%zd", self.gHeaderData.attentionNum];
-    attentionNums.textAlignment = NSTextAlignmentCenter;
-    
-    UILabel* attentionTitle = [[UILabel alloc] init];
-    [attention addSubview:attentionTitle];
-    [attentionTitle mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(collectionNums.mas_bottom).with.offset(0);
-        make.left.equalTo(attention.mas_left).with.offset(0);
-        make.right.equalTo(attention.mas_right).with.offset(0);
-        make.bottom.equalTo(attention.mas_bottom).with.offset(0);
-    }];
-    attentionTitle.backgroundColor = [UIColor clearColor];
-    attentionTitle.text = @"关注";
-    attentionTitle.font = [UIFont systemFontOfSize:13];
-    attentionTitle.textAlignment = NSTextAlignmentCenter;
+    if (!self.gAttention) {
+        
+        UIView* attention = [[UIView alloc] init];
+        [self.gFourLabelBackView addSubview:attention];
+        [attention mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(self.gFourLabelBackView.mas_top).with.offset(0);
+            make.left.equalTo(self.gLike.mas_right).with.offset(labelSpacing*2);
+            make.bottom.equalTo(self.gFourLabelBackView.mas_bottom).with.offset(0);
+            make.width.mas_equalTo(labelWidth);
+        }];
+        attention.backgroundColor = [UIColor clearColor];
+        self.gAttention = attention;
+        [self.gMenuAttr addObject:attention];
+        
+        UITapGestureRecognizer* tapAttention = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction:)];
+        attention.tag = 3;
+        [attention addGestureRecognizer:tapAttention];
+        
+        UILabel* attentionNums = [[UILabel alloc] init];
+        [attention addSubview:attentionNums];
+        [attentionNums mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(attention.mas_top).with.offset(0);
+            make.left.equalTo(attention.mas_left).with.offset(0);
+            make.right.equalTo(attention.mas_right).with.offset(0);
+            make.height.mas_equalTo(attention.mas_height).multipliedBy(0.5);
+        }];
+        attentionNums.backgroundColor = [UIColor clearColor];
+        self.gAttentionNums = attentionNums;
+        attentionNums.textAlignment = NSTextAlignmentCenter;
+        
+        UILabel* attentionTitle = [[UILabel alloc] init];
+        [attention addSubview:attentionTitle];
+        [attentionTitle mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(attentionNums.mas_bottom).with.offset(0);
+            make.left.equalTo(attention.mas_left).with.offset(0);
+            make.right.equalTo(attention.mas_right).with.offset(0);
+            make.bottom.equalTo(attention.mas_bottom).with.offset(0);
+        }];
+        attentionTitle.backgroundColor = [UIColor clearColor];
+        attentionTitle.text = @"关注";
+        attentionTitle.font = [UIFont systemFontOfSize:13];
+        attentionTitle.textAlignment = NSTextAlignmentCenter;
+    }
+    self.gAttentionNums.text = [NSString stringWithFormat:@"%zd", self.gHeaderData.attentionNum];
 }
 
 - (void) tapAction:(UIGestureRecognizer*) gesture{
@@ -675,7 +856,8 @@
             }
             
             //获取图片名称
-            NSString* imageName = [NSString stringWithFormat:@"%@_headicon_head.jpg", self.gHeaderData.username];
+            //NSString* imageName = [NSString stringWithFormat:@"%@_headicon_head.jpg", self.gHeaderData.username];  //去服务器端组装成这个样子
+            NSString* imageName = @"headicon_head.jpg";
             
             //压缩图片为60 * 60
             tempImage = [self imageWithImageSimple:tempImage scaledToSize:CGSizeMake(60, 60)];
@@ -735,6 +917,7 @@
     
     //设置请求头类型
     [manager.requestSerializer setValue:@"form/data" forHTTPHeaderField:@"Content-Type"];
+    [manager.requestSerializer setStringEncoding: NSUTF8StringEncoding];
     
     //设置请求头， 授权码
     //[manager.requestSerializer setValue:@"" forHTTPHeaderField:@"Authentication"];

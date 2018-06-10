@@ -26,7 +26,7 @@
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="defaultUserIcon" translatesAutoresizingMaskIntoConstraints="NO" id="Dh8-I7-CgA">
                                 <rect key="frame" x="5" y="0.0" width="30" height="30"/>
-                                <color key="backgroundColor" red="1" green="0.2330634761" blue="0.9932119895" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="Dh8-I7-CgA" secondAttribute="height" multiplier="1:1" id="ACe-ls-ls1"/>
                                 </constraints>
@@ -125,7 +125,7 @@
                     </view>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="gtJ-Xi-ohJ">
                         <rect key="frame" x="0.0" y="0.0" width="340" height="171"/>
-                        <color key="backgroundColor" red="0.95975980301051667" green="1" blue="0.22213088003808246" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dDY-Dg-MTA" userLabel="Description">
                         <rect key="frame" x="0.0" y="176" width="340" height="0.0"/>

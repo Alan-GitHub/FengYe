@@ -1,17 +1,15 @@
 //
-//  FYDetailInfoController.h
+//  FYAddWorkInfoController.h
 //  FengYe
 //
-//  Created by Alan Turing on 2018/1/21.
+//  Created by Alan Turing on 2018/5/26.
 //  Copyright © 2018年 Alan Turing. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 #import "FYWorksUnitData.h"
 
-@interface FYDetailInfoController : UIViewController
+@interface FYAddWorkInfoController : UIViewController
 
 @property(nonatomic, strong) FYWorksUnitData* unitData;
-@property(nonatomic, assign) BOOL hasRecommend;
-
 @end

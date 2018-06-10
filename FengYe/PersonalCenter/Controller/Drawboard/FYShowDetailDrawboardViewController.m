@@ -19,13 +19,15 @@
 #import "FYDetailInfoController.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "uploadModel.h"
+#import "FYDisplayCell.h"
+#import <SVProgressHUD.h>
 
 
 #define DetailDrawboardCell @"DetailDrawboardCell"
 
 #define Spacing 10
 
-@interface FYShowDetailDrawboardViewController ()<UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIImagePickerControllerDelegate>
+@interface FYShowDetailDrawboardViewController ()<UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
 @property(nonatomic, strong) NSMutableArray<FYWorksUnitData*>* pictures;
 @property(nonatomic, strong) UICollectionView* gCollec;
@@ -36,6 +38,8 @@
 @property(nonatomic, retain) NSMutableArray* uploadArray;
 //已经上传图片数组
 @property(nonatomic, retain) NSMutableArray* uploadedArray;
+
+@property(nonatomic, retain) UIButton* gRegardBtn;
 
 @end
 
@@ -50,26 +54,31 @@
     
     //产生屏幕上半部分视图
     UIView* drawHead = [self getDrawboardHead];
-
-    //暂时用系统的控件来实现。特异化留待后续更新
-//    FYCollectionViewWaterFallLayout* layout = [[FYCollectionViewWaterFallLayout alloc] init];
-//    layout.data = self.pictures;
     
-    //系统控件
-    UICollectionViewFlowLayout* layout = [[UICollectionViewFlowLayout alloc] init];
-    layout.minimumLineSpacing = Spacing;
-    layout.minimumInteritemSpacing = Spacing;
+    //系统控件  --- 方案1
+//    UICollectionViewFlowLayout* layout = [[UICollectionViewFlowLayout alloc] init];
+//    layout.minimumLineSpacing = Spacing;
+//    layout.minimumInteritemSpacing = Spacing;
+    
+    //暂时用系统的控件来实现。特异化留待后续更新  --- 方案2
+    FYCollectionViewWaterFallLayout* layout = [[FYCollectionViewWaterFallLayout alloc] init];
+    layout.data = self.pictures;
     
     UICollectionView* collec = [[UICollectionView alloc] initWithFrame:self.view.bounds collectionViewLayout:layout];
     collec.delegate = self;
     collec.dataSource = self;
     collec.backgroundColor = [UIColor clearColor];
-    [collec registerNib:[UINib nibWithNibName:@"FYDetailDrawboardColleCell" bundle:nil] forCellWithReuseIdentifier:DetailDrawboardCell];
-    collec.contentInset = UIEdgeInsetsMake(drawHead.bounds.size.height + Spacing, Spacing, Spacing, Spacing);
+    //方案1
+    //[collec registerNib:[UINib nibWithNibName:@"FYDetailDrawboardColleCell" bundle:nil] forCellWithReuseIdentifier:DetailDrawboardCell];
+    //collec.contentInset = UIEdgeInsetsMake(drawHead.bounds.size.height + Spacing, Spacing, Spacing, Spacing);
+    //方案2
+    [collec registerNib:[UINib nibWithNibName:@"FYDisplayCell" bundle:nil] forCellWithReuseIdentifier:DetailDrawboardCell];
+    collec.contentInset = UIEdgeInsetsMake(drawHead.bounds.size.height, 0, 0, 0);
     self.gCollec = collec;
     
     //collectionview上添加上半部分的固定视图
-    drawHead.frame = CGRectMake(-Spacing, -drawHead.bounds.size.height - Spacing, ScreenWidth, drawHead.bounds.size.height);
+    //drawHead.frame = CGRectMake(-Spacing, -drawHead.bounds.size.height - Spacing, ScreenWidth, drawHead.bounds.size.height);   //方案1
+    drawHead.frame = CGRectMake(0, -drawHead.bounds.size.height, ScreenWidth, drawHead.bounds.size.height);   //方案2
     [collec addSubview:drawHead];
     
     //背景视图上添加collectionview
@@ -82,14 +91,109 @@
 
 - (void) addNavRightButton{
     
-    UIButton *btn = [UIButton buttonWithType: UIButtonTypeCustom];
-    [btn setTitle:@"➕" forState:UIControlStateNormal];
-    [btn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal] ;
-    [btn sizeToFit];
-    [btn addTarget:self action:@selector(uploadPictureClicked) forControlEvents: UIControlEventTouchUpInside];
+    NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+    NSString* loginName = [userDef objectForKey:@"loginName"];
     
-    UIBarButtonItem  *barbtn = [[UIBarButtonItem alloc] initWithCustomView: btn];
-    self.navigationItem.rightBarButtonItem = barbtn;
+    if (self.userName.length && ![self.userName isEqualToString:loginName]) { //进入的是别人的个人中心
+        
+        UIButton *btn = [UIButton buttonWithType: UIButtonTypeCustom];
+        [btn setTitle:@"+关注" forState:UIControlStateNormal];
+        [btn setTitle:@"✔️" forState:UIControlStateSelected];
+        [btn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        btn.backgroundColor = [UIColor redColor];
+        btn.titleLabel.font = [UIFont systemFontOfSize:17];
+        [btn sizeToFit];
+        [btn addTarget:self action:@selector(regardButtonClicked:) forControlEvents: UIControlEventTouchUpInside];
+        self.gRegardBtn = btn;
+        
+        UIBarButtonItem  *barbtn = [[UIBarButtonItem alloc] initWithCustomView: btn];
+        self.navigationItem.rightBarButtonItem = barbtn;
+    }else{ //myself
+        
+        UIButton *btn = [UIButton buttonWithType: UIButtonTypeCustom];
+        [btn setTitle:@"➕" forState:UIControlStateNormal];
+        [btn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal] ;
+        [btn sizeToFit];
+        [btn addTarget:self action:@selector(uploadPictureClicked) forControlEvents: UIControlEventTouchUpInside];
+        
+        UIBarButtonItem  *barbtn = [[UIBarButtonItem alloc] initWithCustomView: btn];
+        self.navigationItem.rightBarButtonItem = barbtn;
+    }
+}
+
+- (void) regardButtonStatus:(bool) isChoice{
+    
+    self.gRegardBtn.selected = isChoice;
+    if (self.gRegardBtn.selected) {
+        self.gRegardBtn.backgroundColor = [UIColor lightGrayColor];
+    }else{
+        self.gRegardBtn.backgroundColor = [UIColor redColor];
+    }
+}
+
+//关注按钮被点击
+- (void) regardButtonClicked:(UIButton*) btn{
+    
+    btn.selected = !btn.selected;
+    if (btn.selected) {
+        btn.backgroundColor = [UIColor lightGrayColor];
+    }else{
+        btn.backgroundColor = [UIColor redColor];
+    }
+
+    //更新数据库
+    NSMutableDictionary* parameters = [NSMutableDictionary dictionary];
+    
+    parameters[@"ver"] = @"1";
+    parameters[@"service"] = @"DRAWBOARD_REGARD_OR_NOT";
+    parameters[@"biz"] = @"111";
+    parameters[@"time"] = @"20180126225600";
+    
+    NSMutableDictionary* paramData = [NSMutableDictionary dictionary];
+    
+    //当前登录用户
+    NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+    NSString* username = [userDef objectForKey:@"loginName"];
+    paramData[@"loginUser"] = username;
+    
+    //被关注画板所属用户
+    paramData[@"drawOwnerUser"] = self.userName;
+    
+    //被关注画板
+    paramData[@"drawName"] = self.specifyDrawData.drawboardName;
+    
+    //关注还是取消关注
+    paramData[@"regardOrNot"] = [NSString stringWithFormat:@"%zd", btn.selected];
+    
+    parameters[@"data"] = paramData;
+    
+    NSString* url = ServerURL;
+    NSError* error;
+    NSData* jsonData = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:&error];
+    NSString* jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    
+    AFURLSessionManager* manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+    
+    NSMutableURLRequest* req = [[AFJSONRequestSerializer serializer] requestWithMethod:@"POST" URLString:url parameters:nil error:nil];
+    
+    req.timeoutInterval = [[[NSUserDefaults standardUserDefaults] valueForKey:@"timeoutInterval"] longValue];
+    
+    [req setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [req setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+    [req setHTTPBody:[jsonString dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    [[manager dataTaskWithRequest:req completionHandler:^(NSURLResponse * _Nonnull response, NSDictionary*  _Nullable responseObject, NSError * _Nullable error) {
+        if(!error){
+            //NSLog(@"Reply JSON: %@", responseObject);
+            NSInteger retValue = [responseObject[@"retCode"] integerValue];
+            if (retValue == 0) {
+                [SVProgressHUD showErrorWithStatus:@"处理错误"];
+            }
+        } else{
+            NSLog(@"Error: %@, %@, %@", error, response, responseObject);
+            [SVProgressHUD showErrorWithStatus:@"网络故障"];
+        }
+    }] resume];
 }
 
 //上传图片方法
@@ -148,14 +252,19 @@
     
     NSMutableDictionary* paramData = [NSMutableDictionary dictionary];
     
+    //其他用户
     if (self.userName.length) {
-        paramData[@"username"] = self.userName;
-    } else {
-        NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
-        NSString* username = [userDef objectForKey:@"loginName"];
-        paramData[@"username"] = username;
+        paramData[@"otherUser"] = self.userName;
     }
-    paramData[@"drawboardName"] = self.specifyDrawData.drawboardName;
+    
+    //登录用户
+    NSUserDefaults* userDef = [NSUserDefaults standardUserDefaults];
+    NSString* username = [userDef objectForKey:@"loginName"];
+    paramData[@"loginUser"] = username;
+    
+    //画板名
+    paramData[@"drawName"] = self.specifyDrawData.drawboardName;
+    
     parameters[@"data"] = paramData;
     
     NSString* url = ServerURL;
@@ -177,6 +286,12 @@
         if(!error){
             //NSLog(@"Reply JSON: %@", responseObject);
             [self.pictures removeAllObjects];
+            
+            //正确设置关注按钮的状态
+            bool isAttention = [responseObject[@"isAttention"] boolValue];
+            [self regardButtonStatus:isAttention];
+            
+            //
             [self.pictures addObjectsFromArray:[FYWorksUnitData mj_objectArrayWithKeyValuesArray:responseObject[@"detailDrawbData"]]];
             [self.gCollec reloadData];
 
@@ -256,7 +371,10 @@
         make.bottom.equalTo(userInfo.mas_bottom).with.offset(-10);
         make.width.mas_equalTo(headIcon.mas_height).multipliedBy(1);
     }];
-    [headIcon sd_setImageWithURL:[NSURL URLWithString:self.specifyDrawData.ownerHeadIcon] completed:nil];
+    NSString* headiconURL = [self.specifyDrawData.ownerHeadIcon stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [headIcon sd_setImageWithURL:[NSURL URLWithString:headiconURL] completed:nil];
+//    NSString* headIconStr = [NSString stringWithFormat:@"http://192.168.1.101:8080/photo/%@/headicon/head.jpg", self.specifyDrawData.ownerUserName];
+//    NSLog(@"headIconStr=%@", headIconStr);
     headIcon.layer.cornerRadius = (userInfoHeight - 20)/2;
     headIcon.layer.masksToBounds = YES;
     
@@ -370,14 +488,45 @@
     return self.pictures.count;
 }
 
-- (FYDetailDrawboardColleCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
-    
-    FYDetailDrawboardColleCell* cell = [collectionView dequeueReusableCellWithReuseIdentifier:DetailDrawboardCell forIndexPath:indexPath];
+//方案1
+//- (FYDetailDrawboardColleCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
+//
+//    FYDetailDrawboardColleCell* cell = [collectionView dequeueReusableCellWithReuseIdentifier:DetailDrawboardCell forIndexPath:indexPath];
+//
+//    [cell.imageView sd_setImageWithURL:[NSURL URLWithString:self.pictures[indexPath.item].picURL] completed:nil];
+//
+//
+//    return cell;
+//}
 
-    [cell.imageView sd_setImageWithURL:[NSURL URLWithString:self.pictures[indexPath.item].picURL] completed:nil];
+//方案2
+- (FYDisplayCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     
-    //[cell.imageView sd_setImageWithURL:[NSURL URLWithString:@"http://192.168.1.101:8080/photo/alan/2018-04-29 13-46-40.jpg"] completed:nil];
+    FYDisplayCell* cell = [collectionView dequeueReusableCellWithReuseIdentifier:DetailDrawboardCell forIndexPath:indexPath];
     
+    FYWorksUnitData* data = self.pictures[indexPath.item];
+    NSString* workURL = [data.picURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [cell.workImage sd_setImageWithURL:[NSURL URLWithString:workURL] completed:nil];
+    
+    //转发数量
+    NSString* zhuanCaiTxt = data.forwardCount > 0 ? [NSString stringWithFormat:@"%zd", data.forwardCount] : @"";
+    cell.zhuanCaiLabel.text = zhuanCaiTxt;
+    
+    //喜欢数量
+    NSString* loveTxt = data.likeCount > 0 ? [NSString stringWithFormat:@"%zd", data.likeCount] : @"";
+    cell.loveLabel.text = loveTxt;
+    
+    //评论数量
+    NSString* commentTxt = data.commentCount > 0 ? [NSString stringWithFormat:@"%zd", data.commentCount] : @"";
+    cell.commentLabel.text = commentTxt;
+    
+    cell.descriptionLabel.text = data.descriptionText;
+    NSString* headiconURL = [data.headIcon stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [cell.headerIcon sd_setImageWithURL:[NSURL URLWithString:headiconURL] completed:nil];
+    cell.usernameLabel.text = data.owner;
+    cell.workModuleLabel.text = data.templateName;
+    
+    [cell layoutIfNeeded];
     
     return cell;
 }
@@ -404,7 +553,6 @@
 //UIImagePickerController 代理
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info{
     
-    NSLog(@"didFinishPickingMediaWithInfo");
     [picker dismissViewControllerAnimated:YES completion:nil];
     
     //获取用户选择的是照片还是视频
@@ -415,7 +563,8 @@
         
         //获取编辑后的照片
         NSLog(@"获取编辑后的照片");
-        UIImage* tempImage = info[UIImagePickerControllerEditedImage];
+        UIImage* tempImage = info[UIImagePickerControllerEditedImage];   //获取编辑后的图片
+        //UIImage* tempImage = info[UIImagePickerControllerOriginalImage];   //获取原始图片
         
         //将照片存入相册
         if (tempImage) {
@@ -461,7 +610,6 @@
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker{
     
-    NSLog(@"imagePickerControllerDidCancel");
     [picker dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -496,6 +644,7 @@
     
     //设置请求头类型
     [manager.requestSerializer setValue:@"form/data" forHTTPHeaderField:@"Content-Type"];
+    [manager.requestSerializer setStringEncoding: NSUTF8StringEncoding];
     
     //设置请求头， 授权码
     //[manager.requestSerializer setValue:@"" forHTTPHeaderField:@"Authentication"];

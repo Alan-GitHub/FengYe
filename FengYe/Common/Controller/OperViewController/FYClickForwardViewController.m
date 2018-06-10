@@ -126,7 +126,8 @@
     FYModuleCell* drawboardCell = [collectionView dequeueReusableCellWithReuseIdentifier:OperViewClickForward forIndexPath:indexPath];
     NSInteger index = [indexPath item];
     
-    [drawboardCell.coverImage sd_setImageWithURL:[NSURL URLWithString:self.allForwardDraw[index].coverImageURL]];
+    NSString* coverImageURL = [self.allForwardDraw[index].coverImageURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    [drawboardCell.coverImage sd_setImageWithURL:[NSURL URLWithString:coverImageURL]];
     drawboardCell.coverImage.contentMode = UIViewContentModeScaleAspectFill;
     
     drawboardCell.drawboardName.text = self.allForwardDraw[index].drawboardName;
