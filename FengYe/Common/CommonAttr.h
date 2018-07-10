@@ -17,7 +17,8 @@
 #define SystemBottomHeight 49
 #define SystemHeight 113  //20 + 44 + 49
 
-#define ServerURL @"http://192.168.1.101:8080/FengYeApp/UserController"
+//#define ServerURL @"http://192.168.1.101:8080/FengYeApp/UserController"
+#define ServerURL @"http://39.108.120.44:8080/FengYeApp/UserController"
 
 #define TEST false
 

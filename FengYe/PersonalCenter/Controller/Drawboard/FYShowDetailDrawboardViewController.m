@@ -41,6 +41,8 @@
 
 @property(nonatomic, retain) UIButton* gRegardBtn;
 
+//进度条视图
+@property(nonatomic, retain) UIProgressView* gProgressView;
 @end
 
 @implementation FYShowDetailDrawboardViewController
@@ -85,6 +87,12 @@
     [self.view addSubview: collec];
     
     self.imagePicker.delegate = self;
+    
+    //上传图片的进度条
+    self.gProgressView = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
+    self.gProgressView.frame = CGRectMake(ScreenWidth/4, ScreenHeight/3, ScreenWidth/2, 2);
+    [self.view addSubview:self.gProgressView];
+    self.gProgressView.hidden = YES;
     
     [self loadData];
 }
@@ -651,8 +659,7 @@
     
     //上传服务器接口
     NSString* url = ServerURL;
-    
-    
+
     //参数
     NSMutableDictionary* parameters = [NSMutableDictionary dictionary];
     parameters[@"ver"] = @"1";
@@ -687,6 +694,15 @@
         
     } progress:^(NSProgress * _Nonnull uploadProgress) {
         
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.gProgressView.hidden = NO;
+            self.gProgressView.progress = uploadProgress.fractionCompleted;
+            
+            if (self.gProgressView.progress == 1.0) {
+                self.gProgressView.hidden = YES;
+            }
+        });
+   
         NSLog(@"上传进度: %f", uploadProgress.fractionCompleted);
     } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         
